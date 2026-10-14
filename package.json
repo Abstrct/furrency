@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "start": "node serve.mjs",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.tests.json",
-    "test": "tsx tests/pow.test.ts && tsx tests/wallet.test.ts && tsx tests/words.test.ts && tsx tests/site.test.ts",
+    "test": "tsx tests/pow.test.ts && tsx tests/wallet.test.ts && tsx tests/words.test.ts && tsx tests/den-layout.test.ts && tsx tests/site.test.ts",
     "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {

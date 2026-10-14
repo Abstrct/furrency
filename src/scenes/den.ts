@@ -7,6 +7,7 @@ import { Fx } from '../art/fx';
 import type { Hit, Scene } from '../art/stage';
 import { drawGlyph } from '../ui/glyphs';
 import { REALM_COLOR, REALMS, beastName, type Realm } from '../lore';
+import { KING, RING, ZONE_ORDER, ZONE_Y, denFrame, placeZone, zoneOf, type Spot } from './den-layout';
 
 export interface DenUnit {
   id: string; type: number; zone: Realm; slot: number; totem: boolean;
@@ -27,8 +28,6 @@ export interface DenView {
   howl: boolean;
 }
 
-const ZONE_Y: Record<Realm, number> = { star: 0.235, sky: 0.43, root: 0.655, tide: 0.885 };
-const ZONE_ORDER: Realm[] = ['star', 'sky', 'root', 'tide'];
 
 export class DenScene implements Scene {
   view: DenView = { units: [], free: [], name: '', ward: 0, raiders: 0, away: false, ghost: false, enemy: false, ground: 0, howl: false };
@@ -70,9 +69,8 @@ export class DenScene implements Scene {
   draw(ctx: CanvasRenderingContext2D, w: number, h: number, t: number, dt: number, hits: Hit[]) {
     this.w = w; this.h = h;
     const v = this.view;
-    const narrow = w < 900;
-    const l = narrow ? 0 : this.inset.l, r = narrow ? w : w - this.inset.r;
-    const cx = (l + r) / 2, span = Math.max(260, r - l);
+    const frame = denFrame(w, h, this.inset);
+    const { l, r, cx, span, H, top0, size } = frame;
     const age = t - this.born;
 
     sky(ctx, w, h, t, v.enemy);
@@ -92,39 +90,28 @@ export class DenScene implements Scene {
     clouds(ctx, l, r, h * 0.37, t);
     fireflies(ctx, l, r, h, t);
 
-    // the den sits above the dock: zones are placed in the height the dock leaves free
-    const H = narrow ? h - this.inset.b : h - this.inset.b * 0.55;
-    // on a phone the banners and the deed buttons sit at the top: the zones start below them
-    const top0 = narrow ? Math.min(150, h * 0.18) : 0;
-    const size = Math.max(54, Math.min(112, H * 0.12, span / 6.2));
-    // where everything stands: each zone in rows (totems at the back), crowded rows shrink
+    // where everything stands: each zone in its own footprints (see den-layout), lines stack when crowded
     const byZone = new Map<Realm, (DenUnit | FreeSlot & { free: true })[]>();
     for (const z of REALMS) byZone.set(z, []);
     for (const u of v.units) byZone.get(u.zone)!.push(u);
     for (const f of v.free) byZone.get(f.zone)!.push({ ...f, free: true });
     const targets = new Map<string, { x: number; y: number; s: number; tag: boolean }>();
     const freeAt: { f: FreeSlot; x: number; y: number; s: number }[] = [];
-    const isTotem = (a: DenUnit | FreeSlot) => ('free' in a ? (a as FreeSlot).totem : (a as DenUnit).totem);
     for (const z of REALMS) {
-      const list = byZone.get(z)!.sort((a, b) => Number(isTotem(b)) - Number(isTotem(a)) || ('free' in a ? 1 : 0) - ('free' in b ? 1 : 0));
-      const n = list.length;
-      if (!n) continue;
-      const perRow = Math.max(3, Math.floor((span - 60) / (size * 1.18)));
-      const rows = Math.ceil(n / perRow);
-      for (let row = 0; row < rows; row++) {
-        const part = list.slice(row * perRow, (row + 1) * perRow);
-        const back = rows - 1 - row;
-        const rs = Math.pow(0.84, back);
-        const m = part.length;
-        const gap = Math.min(size * 1.55, (span - 60) / Math.max(1, m));
-        const s0 = Math.min(size, gap * 0.92) * rs;
-        part.forEach((u, i) => {
-          const x = cx + (i - (m - 1) / 2) * gap + (z === 'sky' ? Math.sin(i * 2.3) * 8 : 0);
-          const y = top0 + ZONE_Y[z] * (H - top0) - back * size * 0.46 + (z === 'star' || z === 'sky' ? Math.sin(t * 1.2 + i * 1.7 + row) * 5 : 0);
-          if ('free' in u) freeAt.push({ f: u, x, y, s: s0 * 0.8 });
-          else targets.set(u.id, { x, y, s: (u as DenUnit).king ? s0 * 1.2 : s0, tag: gap >= 104 && back === 0 });
-        });
-      }
+      const list = byZone.get(z)!;
+      if (!list.length) continue;
+      const spots: Spot[] = list.map((u) => 'free' in u
+        ? { king: false, totem: u.totem, free: true }
+        : { king: u.king, totem: u.totem, free: false, type: u.type });
+      const at = placeZone(spots, zoneOf(frame, z));
+      list.forEach((u, i) => {
+        const p = at[i];
+        // clouds drift a little, never into a neighbour
+        const x = p.x + (z === 'sky' ? Math.sin(i * 2.3) * Math.min(8, (p.pad - 2) / 2) : 0);
+        const y = p.y + (z === 'star' || z === 'sky' ? Math.sin(t * 1.2 + i * 1.7 + p.row) * 5 : 0);
+        if ('free' in u) freeAt.push({ f: u, x, y, s: p.s * RING });
+        else targets.set(u.id, { x, y, s: u.king ? p.s * KING : p.s, tag: p.room >= 120 && p.row === 0 });
+      });
     }
     for (const [id, tg] of targets) {
       const p = this.pos.get(id);
