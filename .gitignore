@@ -3,3 +3,7 @@ dist
 .DS_Store
 *.log
 qa/reports
+smoke-shots
+qa/playtests/shots
+qa/playtests/logs
+qa/playtests/scratch

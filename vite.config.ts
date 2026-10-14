@@ -17,7 +17,6 @@ export default defineConfig({
   build: {
     target: 'es2022',
     chunkSizeWarningLimit: 1500,
-    rollupOptions: { output: { advancedChunks: { groups: [] } } },
   },
   worker: { format: 'es' },
   server: { port: 5193, host: true, cors: false, headers },

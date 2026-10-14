@@ -1,0 +1,77 @@
+# Checks for every pull request and every push to main: typecheck, tests, and the build at the site
+# root and under a GitHub project-page path. Smoke opens every place in headless Chrome against the
+# live public testnet (and with it unreachable), so it can fail when the testnet is down; it doesn't
+# gate the Pages deploy.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6   # the version in package.json's packageManager
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Build at the root (a custom domain, or the container)
+        run: pnpm build && test -f dist/404.html && test -f dist/robots.txt && test -f dist/og.png
+      - name: Build under a project-page path
+        # share tags, canonical and sitemap must carry the whole address, path included
+        run: |
+          pnpm build
+          grep -q 'og:image" content="https://example.github.io/furrency/og.png"' dist/index.html
+          grep -q '<loc>https://example.github.io/furrency/</loc>' dist/sitemap.xml
+          ! grep -q '%SITE_URL%' dist/index.html
+        env:
+          SITE_URL: https://example.github.io/furrency
+
+  smoke:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Ubuntu 24.04 blocks the unprivileged user namespaces Chrome's sandbox uses.
+      - run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: Every place at the root (desktop, phone, testnet down)
+        run: pnpm smoke
+        env:
+          SMOKE_SHOTS: smoke-shots
+      - name: Every place under a project-page path (any file asked for outside it fails)
+        run: pnpm smoke
+        env:
+          SMOKE_QUICK: 1
+          SITE_URL: https://example.github.io/furrency
+      - name: Keep the screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-shots
+          path: smoke-shots
+          retention-days: 7

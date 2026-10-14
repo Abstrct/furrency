@@ -21,6 +21,15 @@ pnpm build      # dist/ — host it anywhere (GitHub Pages, S3, nginx, `python3 
 
 The built page talks to every system **directly**: the chain node (LCD + Tendermint websocket), each clan's `guild.json`, GRASS, and the clan's Guild API for signup and sign-in. No relay, no server code. Container: `docker build -t furrency . && docker run --rm -p 8080:8080 furrency` serves the same static `dist/`.
 
+### GitHub Pages, with CI
+
+Push to `main` and `.github/workflows/pages.yml` builds and publishes `dist/` to GitHub Pages. Set it up once under **Settings → Pages → Source: GitHub Actions**. No secrets are needed. The share card, sitemap and 404 page pick up the Pages address automatically. `.github/workflows/ci.yml` runs typecheck, `pnpm test`, a root build and a `/furrency/` project-path build, then `pnpm smoke`, which opens every place in headless Chrome against the live testnet and again with it down. The details are in [docs/CI-AND-DEPLOY.md](docs/CI-AND-DEPLOY.md).
+
+```bash
+pnpm typecheck && pnpm test   # what CI checks first
+pnpm smoke                    # needs Chrome and the testnet
+```
+
 ### Dev, through the relay
 
 `pnpm dev` runs the relay inside Vite (`relay/relay.mjs`): clan calls go through it, so the clan session cookie works however the browser treats cross-site cookies. A build can opt in with `VITE_RELAY_URL=/` (and `RELAY=1` on `serve.mjs`, or the container), or `VITE_RELAY_URL=https://relay.example` for a relay elsewhere.

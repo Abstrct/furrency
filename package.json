@@ -9,7 +9,9 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "start": "node serve.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.tests.json",
+    "test": "tsx tests/pow.test.ts && tsx tests/wallet.test.ts && tsx tests/words.test.ts && tsx tests/site.test.ts",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "@noble/curves": "^2.4.0",
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.4",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "undici": "^8.11.2",
     "vite": "^8.3.4"

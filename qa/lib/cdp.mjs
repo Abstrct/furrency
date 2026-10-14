@@ -8,10 +8,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const CHROME_PATHS = [
-  process.env.QA_CHROME,
+  process.env.QA_CHROME, process.env.CHROME,
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   '/Applications/Chromium.app/Contents/MacOS/Chromium',
-  '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser',
+  '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser', '/snap/bin/chromium',
 ].filter(Boolean);
 
 export function findChrome() {
@@ -29,6 +29,7 @@ export async function launchChrome({ port = 9222 + Math.floor(Math.random() * 50
     '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-webgl', '--enable-precise-memory-info',
     '--disable-background-timer-throttling', '--disable-renderer-backgrounding', '--disable-backgrounding-occluded-windows',
     '--autoplay-policy=no-user-gesture-required', '--mute-audio', '--disable-features=BackForwardCache', `--window-size=${width},${height}`, '--hide-scrollbars',
+    process.getuid?.() === 0 ? '--no-sandbox' : '', // containers run as root
     ...extraArgs, 'about:blank',
   ].filter(Boolean);
   const proc = spawn(findChrome(), args, { stdio: ['ignore', 'ignore', 'pipe'] });

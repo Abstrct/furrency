@@ -5,7 +5,7 @@
 #   docker build -t furrency .
 #   docker run --rm -p 8080:8080 furrency            # http://localhost:8080
 #
-# The page's network is baked in when it is built (--build-arg VITE_LCD_URL=…, VITE_RPC_WS_URL,
+# The page's address and network are baked in when it is built (--build-arg VITE_SITE_URL=…, VITE_LCD_URL, VITE_RPC_WS_URL,
 # VITE_DEFAULT_GUILD, VITE_GRASS_URL, VITE_RELAY_URL). It talks to every system directly unless
 # VITE_RELAY_URL names a relay. dist/ is a plain static site: any static host serves it as well.
 
@@ -19,7 +19,7 @@ COPY . .
 # By default the page talks to the chain, GRASS and each clan directly (a plain static site).
 # To route clan reads through the relay in this container instead: --build-arg VITE_RELAY_URL=/ and
 # run with -e RELAY=1.
-ARG VITE_LCD_URL VITE_RPC_WS_URL VITE_DEFAULT_GUILD VITE_GRASS_URL VITE_RELAY_URL VITE_GUILD_DATA
+ARG VITE_SITE_URL VITE_LCD_URL VITE_RPC_WS_URL VITE_DEFAULT_GUILD VITE_GRASS_URL VITE_RELAY_URL VITE_GUILD_DATA
 RUN pnpm build
 
 FROM node:24-alpine
