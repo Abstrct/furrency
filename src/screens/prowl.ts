@@ -13,6 +13,7 @@ import { act, actionBlock } from '../game/actions';
 import { wallet } from '../wallet/wallet';
 import { txq, type TxJob } from '../wallet/queue';
 import { live } from '../chain/live';
+import { howlProgress } from '../pow/howl';
 import { pow } from '../pow/pow';
 import { claimJob, releaseClaim } from '../core/claims';
 import { typeOf, type Ambit } from '../data/catalogue';
@@ -373,7 +374,7 @@ export function prowl(ctx: Ctx): Screen {
     scene.set({
       ours: fighters(ourKin(p), p, false), theirs: fighters(theirKin(f), f, true, a),
       oursName: p ? playerName(p) : 'YOU', theirsName: f ? playerName(f) : '', atk, mark, guardOf: fc?.guard?.id || null,
-      abroad: abroad(), defending: defending(), snatch: abroad() && !wardKeeper(f) && task ? Math.min(1, (task.best?.zeros ?? 0) / Math.max(1, pow.required(task))) : null, noFoe: !f,
+      abroad: abroad(), defending: defending(), snatch: abroad() && !wardKeeper(f) && task ? howlProgress(task) : null, noFoe: !f,
     });
     stable(warbarEl, (b) => paintWarbar(p, f, b));
     stable(strikeEl, (b) => paintStrike(p, a, t, fc, b));

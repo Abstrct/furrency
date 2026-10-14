@@ -110,8 +110,9 @@ export function den(ctx: Ctx): Screen {
   /* ── the scene's view of the den ── */
   function buildProgress(s: OwnedStruct): number {
     const task = pow.active.find((t) => t.kind === 'build' && t.objectId === s.id);
-    if (!task) return 0.02;
-    return Math.min(0.98, Math.max(0.03, (task.best?.zeros ?? 0) / Math.max(1, pow.required(task))));
+    // by time, like dig and forge: the engine waits for the bar to fall within reach before it
+    // hashes, so the best proof so far says nothing about how far along the call is
+    return task ? howlProgress(task) : 0.02;
   }
   function taskOf(s: OwnedStruct) {
     const kind = s.typeId === 14 ? 'mine' : s.typeId === 15 ? 'refine' : null;
@@ -485,7 +486,10 @@ export function den(ctx: Ctx): Screen {
   resize();
   window.addEventListener('resize', resize);
   const timer = setInterval(() => sceneView(player()), 1000);
-  const offAll = [losses.onChange(paint), empire.onChange(paint), wallet.onChange(paint), pow.onChange(() => sceneView(player())), txq.onChange(() => sceneView(player())), onLanded, offTx];
+  // howl progress is measured in time, so it moves every block even while the engine waits to hash
+  let beatAt = 0;
+  const offBeat = live.onBlock(() => { const now = Date.now(); if (now - beatAt < 1000) return; beatAt = now; sceneView(player()); });
+  const offAll = [losses.onChange(paint), empire.onChange(paint), wallet.onChange(paint), pow.onChange(() => sceneView(player())), txq.onChange(() => sceneView(player())), offBeat, onLanded, offTx];
   paint();
 
   return {

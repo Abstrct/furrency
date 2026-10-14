@@ -151,7 +151,8 @@ export class DenScene implements Scene {
         drawKin(ctx, u.type, p.x, p.y, p.s, { t, seed: seedOf(u.id), asleep: u.asleep, hidden: u.hidden, building: u.building, flash: fl, enemy: v.enemy, crown: u.king, hp: u.maxHp ? u.hp / u.maxHp : 1, lunge: Math.sin(lg * Math.PI) });
         ctx.restore();
         if (u.work != null && !u.asleep && u.building == null) workRing(ctx, p.x, p.y - p.s * 1.38, p.s * 0.2, u.work, u.workKind === 'dig' ? '#FF7A1A' : '#FFE53B', t, `${u.workKind === 'dig' ? 'DIG' : 'FORGE'} ${u.eta || ''}`.trim());
-        else if (u.building != null && u.eta) { ctx.save(); ctx.font = `14px ${FONT_BOOM}`; ctx.textAlign = 'center'; ctx.fillStyle = '#22E4FF'; ctx.fillText(u.eta, p.x, p.y - p.s * 1.3); ctx.restore(); }
+        // a call in progress always shows how far along it is, even when the zone is too crowded for name tags
+        else if (u.building != null) workRing(ctx, p.x, p.y - p.s * 1.38, p.s * 0.2, u.building, '#22E4FF', t, `CALL ${u.eta || `${Math.round(u.building * 100)}%`}`);
         if (u.guarding && !u.building) drawGlyph(ctx, 'guard', p.x - p.s * 0.48, p.y - p.s * 0.2, p.s * 0.26, '#FFF8E7', 3);
         hits.push({ id: u.id, x: p.x, y: p.y - p.s * 0.6, r: p.s * 0.62 });
         if (sel || hov || targets.get(u.id)?.tag) tagUnder(ctx, u, p.x, p.y, p.s, sel || hov);
@@ -368,7 +369,7 @@ function freeRing(ctx: CanvasRenderingContext2D, x: number, y: number, s: number
 }
 
 function tagUnder(ctx: CanvasRenderingContext2D, u: DenUnit, x: number, y: number, s: number, strong: boolean) {
-  const label = u.building != null ? `CALLING ${Math.round((u.building || 0) * 100)}%` : beastName(u.type);
+  const label = u.building != null ? `CALLING ${Math.round((u.building || 0) * 100)}%${u.eta ? ` · ${u.eta}` : ''}` : beastName(u.type);
   ctx.save();
   ctx.font = `${strong ? 18 : 15}px ${FONT_BOOM}`;
   const tw = ctx.measureText(label).width + 14;

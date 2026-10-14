@@ -22,7 +22,7 @@
  *   GET  /t/NAME/log                     every action this tester took, with errors seen
  *   GET  /status                         chain height and testers
  *
- * By default it starts the game itself (Vite on 5195, pointed at the devnet: LCD 31317, RPC 36657,
+ * By default it starts the game itself (Vite on 5195, or --game-port N; pointed at the devnet: LCD 31317, RPC 36657,
  * the relay in local mode for the mock guild). The devnet must be running (structs-xyz
  * scripts/devnet/setup.sh). Screenshots and logs land in qa/playtests/. */
 import { createServer } from 'node:http';
@@ -47,14 +47,22 @@ mkdirSync(join(OUT, 'logs'), { recursive: true });
 /* ── the game ─────────────────────────────────────────────────────────── */
 let vite = null;
 if (!APP) {
-  APP = 'http://127.0.0.1:5195';
-  vite = spawn('pnpm', ['exec', 'vite', '--port', '5195', '--host', '127.0.0.1', '--strictPort'], {
+  const GAME_PORT = opt('--game-port', '5195');
+  APP = `http://127.0.0.1:${GAME_PORT}`;
+  vite = spawn('pnpm', ['exec', 'vite', '--port', GAME_PORT, '--host', '127.0.0.1', '--strictPort'], {
     cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'],
     env: { ...process.env, VITE_LCD_URL: LCD, VITE_RPC_WS_URL: RPC, VITE_GRASS_URL: 'off', VITE_DEFAULT_GUILD: '0-1', STRUCTS_LCD: LCD, RELAY_ALLOW_LOCAL: '1' },
   });
   vite.stderr.on('data', (d) => process.stderr.write('[vite] ' + d));
+  // a port someone else holds would make testers play whatever answers there: stop instead
+  vite.on('exit', (code) => { console.error(`!! the game server stopped (exit ${code}); is port ${GAME_PORT} taken? try --game-port 5196`); process.exit(1); });
   for (let i = 0; i < 100; i++) { try { if ((await fetch(APP)).ok) break; } catch { /* starting */ } await sleep(200); }
 }
+// whatever answers must be Furrency
+try {
+  const page = await (await fetch(APP)).text();
+  if (!/<title>Furrency\b/.test(page)) { console.error(`!! ${APP} is not Furrency; pass --game-port or --app`); process.exit(1); }
+} catch (e) { console.error(`!! ${APP} does not answer: ${e.message}`); process.exit(1); }
 const chainHeight = async () => { try { return Number((await (await fetch(`${LCD}/cosmos/base/tendermint/v1beta1/blocks/latest`)).json()).block.header.height); } catch { return 0; } };
 if (!(await chainHeight())) console.warn('!! the devnet does not answer at ' + LCD + ' — start it first (structs-xyz scripts/devnet/setup.sh all)');
 
