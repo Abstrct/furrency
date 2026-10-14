@@ -1,0 +1,114 @@
+{"at":"2026-10-14T14:06:36.039Z","action":{"click":"JOIN","shot":true},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:06:41.078Z","action":{"click":1},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:06:49.932Z","action":{"click":2},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:07:37.817Z","action":{"click":"NEXT","shot":true},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:07:43.425Z","action":{"type":"FangRaider","into":1},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:07:54.928Z","action":{"click":4},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:09:12.533Z","action":{"wait":15000,"shot":true},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:10:09.141Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:11:20.764Z","action":{"click":"CALL NEW KIN","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:12:31.511Z","action":{"click":10,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:12:36.092Z","action":{"click":"STAR BEAR","shot":true},"error":"no control \"STAR BEAR\" — look again"}
+{"at":"2026-10-14T14:13:26.853Z","action":{"scroll":700,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:13:34.834Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:13:34.882Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:14:12.187Z","action":{"tap":"c6","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:15:05.102Z","action":{"click":2,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:15:10.079Z","action":{"tap":"c3"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:15:19.278Z","action":{"click":1},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:15:28.287Z","action":{"tap":"c8"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:17:06.502Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:19:38.684Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:19:49.125Z","action":{"tap":"c10"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:19:50.594Z","action":{"key":"Escape","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:19:57.774Z","action":{"click":2},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:20:03.716Z","action":{"tap":"EMPTY STAR PACK SLOT (CALL)"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:20:11.516Z","action":{"click":1},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:21:14.658Z","look":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:23:51.198Z","action":{"goto":"#/hunt","shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:25:41.064Z","look":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:27:02.922Z","look":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:27:12.452Z","action":{"tap":"DEN OF SMOKETEST"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:27:15.246Z","look":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:27:24.096Z","action":{"click":"PROWL"},"route":"#/prowl","errors":[]}
+{"at":"2026-10-14T14:27:29.244Z","action":{"goto":"#/hunt"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:27:29.257Z","action":{"tap":"DEN OF SMOKETEST"},"error":"no canvas target \"DEN OF SMOKETEST\" — look again"}
+{"at":"2026-10-14T14:27:35.044Z","look":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:27:38.211Z","look":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:27:40.800Z","look":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:27:50.084Z","action":{"type":"Smoke","into":12},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:27:59.122Z","action":{"click":16},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:28:04.072Z","action":{"click":18},"route":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:28:06.077Z","look":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:28:12.696Z","action":{"click":18},"route":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:31:27.043Z","action":{"click":12},"route":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:32:37.009Z","look":"?","errors":[]}
+{"at":"2026-10-14T14:32:37.057Z","look":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:32:37.987Z","action":{"tap":"c2"},"route":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:32:47.691Z","action":{"click":12},"route":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:32:57.246Z","action":{"click":"AUTO"},"route":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:33:22.326Z","action":{"wait":20000},"route":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:33:26.426Z","look":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:33:36.396Z","action":{"click":10},"route":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:33:40.744Z","action":{"goto":"#/hunt"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:33:46.670Z","action":{"click":"SHARD"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:33:55.634Z","action":{"click":19},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:34:04.251Z","action":{"click":21},"route":"#/prowl/1-10","errors":[]}
+{"at":"2026-10-14T14:34:08.114Z","action":{"click":21},"route":"#/prowl/1-10","errors":[]}
+{"at":"2026-10-14T14:34:10.976Z","action":{"tap":"STAR BEAR"},"error":"no canvas target \"STAR BEAR\" — look again"}
+{"at":"2026-10-14T14:34:54.941Z","look":"#/prowl/1-6","errors":[]}
+{"at":"2026-10-14T14:35:07.618Z","action":{"click":11},"route":"#/prowl/1-10","errors":[]}
+{"at":"2026-10-14T14:35:17.490Z","action":{"click":11},"route":"#/prowl/1-10","errors":[]}
+{"at":"2026-10-14T14:35:26.338Z","action":{"click":11},"route":"#/prowl/1-10","errors":[]}
+{"at":"2026-10-14T14:36:09.458Z","action":{"wait":30000},"route":"#/prowl/1-10","errors":[]}
+{"at":"2026-10-14T14:36:14.246Z","action":{"goto":"#/den"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:36:19.920Z","action":{"goto":"#/hunt"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:36:25.858Z","action":{"type":"FENCLAW","into":12},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:36:31.781Z","action":{"click":16},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:36:43.041Z","action":{"click":18},"route":"#/prowl/1-4","errors":[]}
+{"at":"2026-10-14T14:36:47.867Z","action":{"click":"FIGHT"},"route":"#/prowl/1-4","errors":[]}
+{"at":"2026-10-14T14:36:53.955Z","action":{"click":12},"route":"#/prowl/1-4","errors":[]}
+{"at":"2026-10-14T14:37:05.063Z","action":{"click":11},"route":"#/prowl/1-4","errors":[]}
+{"at":"2026-10-14T14:37:09.923Z","action":{"goto":"#/den"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:37:11.175Z","look":"#/prowl/1-10","errors":[]}
+{"at":"2026-10-14T14:37:54.941Z","action":{"wait":45000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:38:59.371Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:39:16.662Z","action":{"reload":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:40:07.610Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:40:16.355Z","action":{"goto":"#/hunt"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:40:50.122Z","action":{"click":"SHARD","shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:40:59.166Z","action":{"click":20},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:41:36.166Z","action":{"click":21,"shot":true},"route":"#/den/1-12","errors":[]}
+{"at":"2026-10-14T14:41:43.178Z","action":{"click":"PROWL THIS DEN"},"route":"#/prowl/1-12","errors":[]}
+{"at":"2026-10-14T14:41:52.503Z","action":{"click":10},"route":"#/prowl/1-12","errors":[]}
+{"at":"2026-10-14T14:42:37.298Z","action":{"wait":3000,"shot":true},"route":"#/prowl/1-12","errors":[]}
+{"at":"2026-10-14T14:42:45.799Z","action":{"click":"PROWL 1 SHARD"},"route":"#/prowl/1-12","errors":[]}
+{"at":"2026-10-14T14:43:40.025Z","look":"#/prowl/1-12","errors":[]}
+{"at":"2026-10-14T14:43:53.450Z","action":{"tapxy":[685,708]},"route":"#/prowl/1-12","errors":[]}
+{"at":"2026-10-14T14:43:57.469Z","action":{"wait":4000},"route":"#/prowl/1-12","errors":[]}
+{"at":"2026-10-14T14:44:02.334Z","action":{"goto":"#/hunt"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:44:06.627Z","action":{"type":"ROOK","into":12},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:44:11.663Z","action":{"click":16},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:44:16.284Z","action":{"click":18},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:44:26.400Z","action":{"type":"LUXEAR","into":12},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:44:29.266Z","action":{"click":16},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:44:35.212Z","action":{"click":18},"route":"#/prowl/1-8","errors":[]}
+{"at":"2026-10-14T14:44:44.516Z","action":{"click":18},"route":"#/prowl/1-8","errors":[]}
+{"at":"2026-10-14T14:45:42.042Z","action":{"click":"AUTO","shot":true},"route":"#/prowl/1-8","errors":[]}
+{"at":"2026-10-14T14:46:21.546Z","action":{"wait":10000,"shot":true},"route":"#/prowl/1-8","errors":[]}
+{"at":"2026-10-14T14:46:44.506Z","action":{"goto":"#/den","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:47:11.457Z","action":{"click":"DEFEND","shot":true},"route":"#/prowl/1-15","errors":[]}
+{"at":"2026-10-14T14:47:22.418Z","action":{"click":"POUNCE"},"route":"#/prowl/1-15","errors":[]}
+{"at":"2026-10-14T14:47:22.430Z","action":{"click":"POUNCE"},"error":"no control \"POUNCE\" — look again"}
+{"at":"2026-10-14T14:47:22.442Z","action":{"click":"POUNCE"},"error":"no control \"POUNCE\" — look again"}
+{"at":"2026-10-14T14:47:53.420Z","look":"#/prowl/1-15","errors":[]}
+{"at":"2026-10-14T14:48:32.828Z","action":{"click":"DEN","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:48:38.106Z","action":{"click":13},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:49:11.501Z","action":{"wait":30000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:49:16.600Z","action":{"goto":"#/hunt"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:49:18.615Z","action":{"type":"GLYPH","into":12},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:49:20.945Z","action":{"click":16},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:49:27.811Z","action":{"click":18},"route":"#/prowl/1-15","errors":[]}
+{"at":"2026-10-14T14:49:48.807Z","action":{"click":"FIGHT","shot":true},"route":"#/prowl/1-15","errors":[]}
+{"at":"2026-10-14T14:49:55.882Z","action":{"click":12},"route":"#/prowl/1-15","errors":[]}
+{"at":"2026-10-14T14:50:20.898Z","action":{"wait":25000},"route":"#/prowl/1-15","errors":[]}

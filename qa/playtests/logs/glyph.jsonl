@@ -1,0 +1,75 @@
+{"at":"2026-10-14T14:06:34.384Z","look":"#/","errors":[]}
+{"at":"2026-10-14T14:07:37.830Z","action":{"click":"GLYPHS","shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:08:14.262Z","action":{"scroll":600,"shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:09:26.916Z","action":{"scroll":700,"shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:10:20.783Z","action":{"goto":"#/kin","shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:11:26.035Z","action":{"scroll":1400,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:12:40.576Z","action":{"scroll":-500,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:13:33.873Z","action":{"click":"JOIN","shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:14:13.365Z","action":{"click":2,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:14:18.053Z","action":{"type":"fluffy cat jumps","into":1},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:15:23.202Z","action":{"click":"BIND","shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:15:33.068Z","action":{"click":"BACK"},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:17:08.106Z","action":{"click":"NEW PAW","shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:17:18.492Z","action":{"click":2},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:19:55.028Z","action":{"click":"NEXT","shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:22:12.544Z","look":"#/kin","errors":[]}
+{"at":"2026-10-14T14:23:41.246Z","action":{"type":"x!","into":1,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:25:59.563Z","look":"#/kin","errors":[]}
+{"at":"2026-10-14T14:30:31.090Z","look":"#/kin","errors":[]}
+{"at":"2026-10-14T14:30:41.643Z","action":{"type":"Glyphpaw","into":1},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:31:56.854Z","action":{"click":4,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:32:00.980Z","action":{"click":"ENTER DEN","shot":true},"error":"no control \"ENTER DEN\" — look again"}
+{"at":"2026-10-14T14:36:11.878Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:38:47.770Z","action":{"click":"GLYPHPAW","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:38:53.561Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:39:33.043Z","action":{"click":"CALL NEW KIN","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:40:37.330Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:05.643Z","action":{"tap":"SUN LION","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:37.106Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:42:23.433Z","action":{"tap":"DIG MOLE","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:43:05.447Z","action":{"goto":"#/hunt","shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:43:52.988Z","action":{"click":17,"shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:44:19.815Z","action":{"click":"PEEK","shot":true},"route":"#/den/1-7","errors":[]}
+{"at":"2026-10-14T14:45:39.616Z","action":{"click":"PROWL THIS DEN","shot":true},"route":"#/prowl/1-7","errors":[]}
+{"at":"2026-10-14T14:45:50.844Z","action":{"click":"PROWL 1 SHARD","shot":true},"error":"no control \"PROWL 1 SHARD\" — look again"}
+{"at":"2026-10-14T14:45:54.095Z","look":"#/prowl/1-7","errors":[]}
+{"at":"2026-10-14T14:46:22.242Z","action":{"click":10,"shot":true},"route":"#/prowl/1-7","errors":[]}
+{"at":"2026-10-14T14:46:29.905Z","action":{"click":"POUNCE PULSE 3/3"},"route":"#/prowl/1-7","errors":[]}
+{"at":"2026-10-14T14:46:55.451Z","action":{"wait":8000,"shot":true},"route":"#/prowl/1-7","errors":[]}
+{"at":"2026-10-14T14:47:05.604Z","action":{"click":"AUTO"},"route":"#/prowl/1-7","errors":[]}
+{"at":"2026-10-14T14:47:50.344Z","action":{"wait":20000,"shot":true},"route":"#/prowl/1-7","errors":[]}
+{"at":"2026-10-14T14:48:27.632Z","action":{"goto":"#/glow","shot":true},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T14:48:51.807Z","action":{"scroll":500,"shot":true},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T14:49:20.201Z","action":{"click":"FEED","shot":true},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T14:49:31.179Z","action":{"goto":"#/den"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:49:52.779Z","action":{"click":"ROAM NEW DEN","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:50:42.098Z","action":{"click":"OK","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:50:47.672Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:51:15.562Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:52:39.110Z","action":{"click":11,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:53:20.923Z","action":{"tap":"c0","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:53:29.051Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:54:12.483Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:54:23.566Z","action":{"click":"GLYPHPAW"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:54:53.116Z","action":{"click":"FORGET","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:55:00.913Z","action":{"click":"NO"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:55:00.929Z","action":{"click":"GLYPHPAW"},"error":"no control \"GLYPHPAW\" — look again"}
+{"at":"2026-10-14T14:55:31.362Z","action":{"click":"WORDS","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:55:36.712Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:57:59.922Z","action":{"reload":true,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:58:05.237Z","action":{"goto":"#/hunt"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:58:45.395Z","action":{"type":"zzzq","into":12,"shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:58:55.181Z","action":{"type":"","into":12},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:59:39.578Z","action":{"click":"NAP","shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T15:01:53.393Z","action":{"goto":"#/prowl","shot":true},"route":"#/prowl","errors":[]}
+{"at":"2026-10-14T15:04:24.562Z","action":{"goto":"#/","shot":true},"route":"#/","errors":[]}
+{"at":"2026-10-14T15:04:31.996Z","action":{"goto":"#/den"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:04:37.939Z","action":{"click":"CALL NEW KIN"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:06:59.199Z","action":{"click":4,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:07:03.808Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:09:16.020Z","action":{"wait":60000,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:09:24.507Z","action":{"click":"CALL BADGER"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:10:47.434Z","action":{"click":"FORGE BADGER FORGE 500 GLOW 8 PULSE STEADY","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:11:21.566Z","action":{"wait":30000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:12:51.263Z","action":{"tap":"FORGE BADGER","shot":true},"route":"#/den","errors":[]}

@@ -1,0 +1,38 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "furrency",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev",
+        "--port",
+        "5193",
+        "--strictPort"
+      ],
+      "port": 5193
+    },
+    {
+      "name": "furrency-devnet",
+      "runtimeExecutable": "/usr/bin/env",
+      "runtimeArgs": [
+        "VITE_LCD_URL=http://127.0.0.1:31317",
+        "VITE_RPC_WS_URL=ws://127.0.0.1:36657/websocket",
+        "VITE_GRASS_URL=off",
+        "VITE_DEFAULT_GUILD=0-1",
+        "STRUCTS_LCD=http://127.0.0.1:31317",
+        "RELAY_ALLOW_LOCAL=1",
+        "pnpm",
+        "exec",
+        "vite",
+        "--port",
+        "5194",
+        "--host",
+        "127.0.0.1",
+        "--strictPort"
+      ],
+      "port": 5194,
+      "url": "http://127.0.0.1:5194"
+    }
+  ]
+}

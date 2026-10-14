@@ -1,0 +1,53 @@
+{"at":"2026-10-14T14:06:32.030Z","look":"#/","errors":[]}
+{"at":"2026-10-14T14:07:29.897Z","action":{"wait":1500,"shot":true},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:07:53.972Z","action":{"click":"KIN","shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:08:35.258Z","action":{"scroll":600,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:09:33.832Z","action":{"scroll":600,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:10:30.917Z","action":{"goto":"#/glyphs","shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:11:32.401Z","action":{"click":"JOIN","shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:12:44.839Z","action":{"click":"NEW PAW","shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:12:52.887Z","action":{"click":2},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:13:45.828Z","action":{"click":"NEXT","shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:14:17.268Z","action":{"type":"MuseMane","into":1,"shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:15:41.397Z","action":{"click":"JOIN · ROAM","shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:17:23.556Z","action":{"wait":8000,"shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:20:32.707Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:21:04.479Z","action":{"click":"ENTER DEN","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:23:26.021Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:24:01.597Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:26:10.092Z","action":{"click":"CALL MOLE","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:26:21.436Z","action":{"click":1},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:31:03.712Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:34:07.448Z","action":{"goto":"#/hunt","shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:34:20.554Z","action":{"click":"Zoom in"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:37:05.471Z","action":{"click":"Zoom in","shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:37:17.763Z","action":{"click":"Zoom out"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:37:23.696Z","action":{"click":"Zoom out"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:37:29.622Z","action":{"click":"Zoom out"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:38:57.677Z","action":{"click":"Zoom out","shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:39:47.603Z","action":{"click":"FENCLAW","shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:40:46.257Z","action":{"click":27,"shot":true},"route":"#/prowl/1-4","errors":[]}
+{"at":"2026-10-14T14:41:08.459Z","action":{"click":"FIGHT","shot":true},"route":"#/prowl/1-4","errors":[]}
+{"at":"2026-10-14T14:41:24.716Z","action":{"goto":"#/hunt"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:41:29.657Z","action":{"click":"ROOK"},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:41:38.815Z","action":{"click":27},"route":"#/prowl/1-12","errors":[]}
+{"at":"2026-10-14T14:42:24.001Z","action":{"click":"FIGHT","shot":true},"route":"#/prowl/1-12","errors":[]}
+{"at":"2026-10-14T14:43:27.032Z","action":{"click":"POUNCE","shot":true},"route":"#/prowl/1-12","errors":[]}
+{"at":"2026-10-14T14:44:01.143Z","action":{"goto":"#/glow","shot":true},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T14:44:25.249Z","action":{"scroll":500,"shot":true},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T14:45:39.539Z","action":{"goto":"#/den","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:46:22.680Z","action":{"click":"CALL NEW KIN","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:46:30.230Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:46:30.242Z","action":{"click":"HOME PACK"},"error":"no control \"HOME PACK\" — look again"}
+{"at":"2026-10-14T14:46:37.058Z","action":{"click":"CALL NEW KIN"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:46:38.429Z","action":{"click":2},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:46:41.074Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:46:45.530Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:47:04.994Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:47:12.122Z","action":{"click":"NO KING CALL","shot":true},"error":"no control \"NO KING CALL\" — look again"}
+{"at":"2026-10-14T14:47:46.252Z","action":{"click":11,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:48:31.398Z","action":{"wait":20000,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:48:37.126Z","action":{"click":"CALL NEW KIN"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:48:40.073Z","action":{"click":2},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:49:01.960Z","action":{"wait":4000,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:49:32.458Z","action":{"tap":"SUN LION","shot":true},"route":"#/den","errors":[]}

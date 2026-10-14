@@ -1,0 +1,144 @@
+{"at":"2026-10-14T14:06:32.836Z","look":"#/","errors":[]}
+{"at":"2026-10-14T14:07:36.340Z","action":{"click":"KIN","shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:07:55.792Z","action":{"scroll":800,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:08:11.483Z","action":{"scroll":800},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:08:12.404Z","action":{"scroll":800},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:09:23.919Z","action":{"scroll":800,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:10:22.135Z","action":{"click":"JOIN","shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:10:28.906Z","action":{"click":1},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:10:35.420Z","action":{"click":2},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:11:35.526Z","action":{"click":"NEXT","shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:11:43.841Z","action":{"type":"Rook","into":1},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:11:49.777Z","action":{"click":"NAME"},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:11:57.197Z","action":{"type":"Rook","into":1},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:13:06.112Z","action":{"click":4,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:14:08.099Z","action":{"wait":15000,"shot":true},"route":"#/kin","errors":[]}
+{"at":"2026-10-14T14:15:02.004Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:15:06.703Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:16:38.034Z","action":{"tap":"SUN LION","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:18:47.299Z","action":{"click":"CALL MOLE","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:18:48.202Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:22:49.538Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:27:27.554Z","action":{"wait":30000,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:30:58.703Z","action":{"tap":"EMPTY STAR PACK SLOT","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:31:07.248Z","action":{"click":2},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:31:32.216Z","action":{"wait":20000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:31:38.148Z","action":{"tap":"EMPTY SKY PACK SLOT"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:31:46.650Z","action":{"click":2},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:32:10.071Z","action":{"wait":20000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:32:15.995Z","action":{"tap":"EMPTY TIDE PACK SLOT"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:32:25.026Z","action":{"click":3},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:32:52.484Z","action":{"wait":25000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:32:55.493Z","action":{"tap":"EMPTY STAR TOTEM SLOT"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:36:43.574Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:38:49.078Z","action":{"click":"SHADE BAT","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:38:57.144Z","action":{"click":"HIDE 2"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:39:40.849Z","action":{"wait":8000,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:40:38.612Z","action":{"click":"GUARD 1","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:40:44.392Z","action":{"click":5},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:09.129Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:18.506Z","action":{"click":"DEEP MINK"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:24.774Z","action":{"click":"SUN LION"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:32.365Z","action":{"click":"SHADE BAT"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:35.311Z","action":{"click":"FREE 1"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:41.337Z","action":{"wait":6000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:47.265Z","action":{"click":"GUARD 1"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:54.150Z","action":{"click":"SUN LION ROOT"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:42:13.727Z","action":{"wait":5000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:42:16.589Z","action":{"click":"COMET FOX"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:42:21.890Z","action":{"click":"NAP"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:42:23.758Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:42:30.798Z","action":{"click":"WAKE 2"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:42:36.831Z","action":{"wait":6000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:42:42.018Z","action":{"click":"SUN LION"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:43:33.688Z","action":{"click":"SKY","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:44:10.984Z","action":{"click":"DEFEND","shot":true},"route":"#/prowl/1-13","errors":[]}
+{"at":"2026-10-14T14:44:13.344Z","look":"#/prowl/1-13","errors":[]}
+{"at":"2026-10-14T14:45:20.732Z","action":{"click":"POUNCE","shot":true},"route":"#/prowl/1-13","errors":[]}
+{"at":"2026-10-14T14:45:52.303Z","action":{"wait":5000,"shot":true},"route":"#/prowl/1-13","errors":[]}
+{"at":"2026-10-14T14:45:59.138Z","action":{"click":"POUNCE"},"route":"#/prowl/1-13","errors":[]}
+{"at":"2026-10-14T14:46:14.603Z","action":{"wait":15000},"route":"#/prowl/1-13","errors":[]}
+{"at":"2026-10-14T14:46:33.894Z","action":{"click":"POUNCE","shot":true},"route":"#/prowl/1-13","errors":[]}
+{"at":"2026-10-14T14:46:39.712Z","look":"#/prowl/1-13","errors":[]}
+{"at":"2026-10-14T14:47:07.424Z","action":{"click":"PROWL 1 SHARD","shot":true},"route":"#/prowl/1-13","errors":[]}
+{"at":"2026-10-14T14:47:41.712Z","action":{"goto":"#/glow","shot":true},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T14:47:49.343Z","look":"#/glow","errors":[]}
+{"at":"2026-10-14T14:48:24.774Z","action":{"scroll":700,"shot":true},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T14:48:51.768Z","action":{"click":"FEED","shot":true},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T14:48:56.574Z","action":{"goto":"#/den"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:48:59.908Z","action":{"click":"CALL BADGER"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:49:04.056Z","action":{"click":"FORGE BADGER"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:49:24.978Z","action":{"goto":"#/hunt","shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:49:32.764Z","action":{"type":"Muse","into":12},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:50:11.965Z","action":{"click":16,"shot":true},"route":"#/hunt","errors":[]}
+{"at":"2026-10-14T14:50:51.293Z","action":{"click":"PEEK","shot":true},"route":"#/den/1-13","errors":[]}
+{"at":"2026-10-14T14:51:28.223Z","action":{"click":10,"shot":true},"route":"#/den/1-13","errors":[]}
+{"at":"2026-10-14T14:51:42.169Z","action":{"click":"MY DEN"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:52:50.914Z","action":{"click":"ROAM NEW DEN","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:52:58.909Z","action":{"click":"OK"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:52:58.921Z","action":{"tap":"EMPTY ROOT PACK SLOT"},"error":"no canvas target \"EMPTY ROOT PACK SLOT\" — look again"}
+{"at":"2026-10-14T14:53:03.454Z","action":{"click":0},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:53:08.837Z","action":{"tap":"c11"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:53:12.835Z","action":{"click":"IRON RHINO"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:53:18.025Z","action":{"goto":"#/glyphs"},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:53:58.715Z","look":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:54:05.662Z","action":{"goto":"#/den"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:54:05.701Z","action":{"tap":"EMPTY ROOT TOTEM SLOT"},"error":"no canvas target \"EMPTY ROOT TOTEM SLOT\" — look again"}
+{"at":"2026-10-14T14:54:06.660Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:54:06.674Z","action":{"tap":"EMPTY TIDE TOTEM SLOT"},"error":"no canvas target \"EMPTY TIDE TOTEM SLOT\" — look again"}
+{"at":"2026-10-14T14:54:07.632Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:54:07.644Z","action":{"tap":"EMPTY SKY TOTEM SLOT"},"error":"no canvas target \"EMPTY SKY TOTEM SLOT\" — look again"}
+{"at":"2026-10-14T14:54:08.582Z","action":{"key":"Escape"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:54:37.604Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:55:11.966Z","action":{"tap":"c11","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:55:23.076Z","action":{"click":"GLOW STONE"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:56:05.776Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:56:14.188Z","action":{"click":3},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:57:17.153Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:57:26.576Z","action":{"click":"DEEP MINK"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:58:01.294Z","action":{"click":"HIDE 2"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:58:44.107Z","action":{"tap":"GLOW STONE","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:59:47.590Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:00:50.822Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:04:21.464Z","action":{"wait":60000,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:05:28.302Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:06:28.322Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:06:34.328Z","action":{"click":"SUN LION"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:06:40.277Z","action":{"click":"TIDE"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:06:44.305Z","action":{"wait":4000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:08:18.160Z","action":{"click":"STAR","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:08:23.021Z","action":{"click":"LEAP"},"error":"no control \"LEAP\" — look again"}
+{"at":"2026-10-14T15:08:28.962Z","action":{"click":"TIDE"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:08:33.685Z","action":{"click":"ROOT"},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:09:39.023Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:10:39.054Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:11:39.079Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:13:04.338Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:15:39.742Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T15:16:42.227Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:17:42.246Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:18:42.270Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:19:46.026Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:20:46.044Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:21:46.061Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:22:49.108Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:23:49.125Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:24:49.155Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:25:52.216Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:26:52.241Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:27:52.260Z","action":{"wait":60000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T15:27:56.448Z","action":{"goto":"#/glow"},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:27:56.462Z","action":{"click":"FEED","shot":true},"error":"no control \"FEED\" — look again"}
+{"at":"2026-10-14T15:28:25.382Z","look":"#/glow","errors":[]}
+{"at":"2026-10-14T15:28:29.135Z","action":{"scroll":700},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:28:55.118Z","action":{"click":10,"shot":true},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:29:01.860Z","action":{"click":3},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:29:33.759Z","action":{"wait":10000,"shot":true},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:29:40.447Z","action":{"click":3},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:29:48.466Z","action":{"wait":8000},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:30:14.023Z","look":"#/glow","errors":[]}
+{"at":"2026-10-14T15:30:20.329Z","action":{"click":11},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:30:25.956Z","action":{"click":3},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:30:35.971Z","action":{"wait":10000},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:30:43.709Z","action":{"click":"PULL"},"route":"#/glow","errors":[]}
+{"at":"2026-10-14T15:30:53.730Z","action":{"wait":10000},"route":"#/glow","errors":[]}

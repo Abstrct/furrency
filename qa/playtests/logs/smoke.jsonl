@@ -1,0 +1,7 @@
+{"at":"2026-10-14T14:03:58.032Z","action":{"click":"JOIN"},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:04:01.016Z","action":{"click":"NEW PAW","wait":2500},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:04:03.131Z","action":{"click":"LATER","wait":2000},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:04:07.391Z","action":{"type":"SmokeTest","into":1},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:04:20.036Z","action":{"click":"JOIN · ROAM","wait":12000},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:04:24.056Z","action":{"goto":"#/den","wait":4000},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:38:37.308Z","look":"#/den","errors":[]}

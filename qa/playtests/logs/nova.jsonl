@@ -1,0 +1,27 @@
+{"at":"2026-10-14T14:07:29.431Z","look":"#/","errors":[]}
+{"at":"2026-10-14T14:08:02.840Z","action":{"click":"JOIN","shot":true},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:09:08.521Z","action":{"click":1,"shot":true},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:09:18.767Z","action":{"click":2},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:10:19.404Z","action":{"click":"NEXT","shot":true},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:10:26.947Z","action":{"type":"NovaPaw","into":1},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:11:34.022Z","action":{"click":"NAME","shot":true},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:11:45.971Z","action":{"type":"NovaPaw","into":1},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:12:55.236Z","action":{"click":4,"shot":true},"route":"#/","errors":[]}
+{"at":"2026-10-14T14:12:59.073Z","action":{"click":"ENTER DEN","shot":true},"error":"no control \"ENTER DEN\" — look again"}
+{"at":"2026-10-14T14:14:03.210Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:14:56.024Z","action":{"click":11,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:16:23.036Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:18:43.254Z","action":{"wait":20000,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:22:15.538Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:23:58.318Z","action":{"tap":"DIG MOLE","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:26:09.023Z","look":"#/den","errors":[]}
+{"at":"2026-10-14T14:31:04.817Z","action":{"wait":45000,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:34:11.525Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:37:11.514Z","action":{"click":"GLYPHS","shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:38:56.905Z","action":{"scroll":700,"shot":true},"route":"#/glyphs","errors":[]}
+{"at":"2026-10-14T14:39:46.549Z","action":{"click":"DEN","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:40:46.124Z","action":{"click":12,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:41:10.811Z","action":{"click":1,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:43:00.122Z","action":{"wait":60000,"shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:43:57.870Z","action":{"tap":"c9","shot":true},"route":"#/den","errors":[]}
+{"at":"2026-10-14T14:44:04.430Z","action":{"key":"Escape"},"route":"#/den","errors":[]}

@@ -1,0 +1,16 @@
+{
+  "name": "Furrency — Be the Alpha",
+  "short_name": "Furrency",
+  "description": "Dig · Forge · Pounce · Howl. A comic-ink fur-beast strategy game on the Structs network.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#140C2B",
+  "theme_color": "#FF2E88",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
