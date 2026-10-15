@@ -6,11 +6,12 @@ import { howlEta, fmtSeconds } from '../lore';
 
 /** The estimate last shown per task, so a reading taken in a busy moment (a stalled tab, bunched blocks,
  * a dip in hash rate) can't throw "~5M" to "~4H" and back: the shown wait counts down by itself, and
- * each new reading may move it at most ×2 either way. */
+ * a new reading may raise it at most ×2 (a lower reading is taken as it is). */
 const told = new Map<string, { s: number; at: number }>();
 /** Seconds until the task can land (a cautious hash rate when the engine is idle), or null. */
 export function howlSeconds(task: PowTask | undefined): number | null {
-  if (!task) return null;
+  // before the first block the height is unknown and every bar reads 64 zeros: no estimate beats a wild one
+  if (!task || !live.height) return null;
   const rate = Math.max(pow.rate, (pow.settings.threads || 1) * 1.5e6);
   const raw = howlEta({ have: task.best?.zeros ?? 0, need: pow.required(task), blocksTo: (z) => pow.blocksUntil(task, z), secondsFor: (z) => Math.pow(16, z) / rate });
   if (raw == null) return null;
@@ -19,8 +20,9 @@ export function howlSeconds(task: PowTask | undefined): number | null {
   if (prev && raw > 0 && now - prev.at < 1000) return Math.max(1, prev.s - (now - prev.at) / 1000);
   let s = raw;
   if (prev && raw > 0) {
+    // a drop is news (the bar fell, a proof turned up) and is taken at once; a rise may be a busy moment, so at most ×2
     const expected = Math.max(1, prev.s - (now - prev.at) / 1000);
-    s = Math.min(expected * 2, Math.max(expected / 2, raw));
+    s = Math.min(expected * 2, raw);
   }
   if (told.size > 64) { const open = new Set(pow.active.map((t) => t.id)); for (const id of told.keys()) if (!open.has(id)) told.delete(id); }
   told.set(task.id, { s, at: now });

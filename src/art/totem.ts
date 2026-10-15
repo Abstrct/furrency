@@ -22,8 +22,9 @@ export function drawKin(ctx: CanvasRenderingContext2D, typeId: number, x: number
   const m = ctx.getTransform(), sc = Math.hypot(m.a, m.b) || 1;
   const px = size * sc;
   if (px < 14 || px > 900) return drawKinNow(ctx, typeId, x, y, size, pose);
-  // resolution in ~9% steps, so a beast that grows or shrinks reuses its canvas until it really changes
-  const res = Math.pow(2, Math.round(Math.log2(px) * 8) / 8);
+  // resolution in ~9% steps, so a beast that grows or shrinks reuses its canvas until it really changes;
+  // rounded up, so the copy is only ever drawn smaller than painted (never stretched, never soft)
+  const res = Math.pow(2, Math.ceil(Math.log2(px) * 8) / 8);
   const key = `${typeId}|${pose.seed}|${res}|${pose.asleep ? 1 : 0}${pose.hidden ? 1 : 0}${pose.enemy ? 1 : 0}${pose.crown ? 1 : 0}${pose.still ? 1 : 0}|${pose.hp == null ? '' : Math.round(pose.hp * 20)}|${pose.building == null ? '' : Math.round(pose.building * 100)}`;
   const now = performance.now();
   let sp = sprites.get(key);
@@ -44,7 +45,10 @@ export function drawKin(ctx: CanvasRenderingContext2D, typeId: number, x: number
     sctx.setTransform(sc, 0, 0, sc, 0, 0);
     drawKinNow(sctx, typeId, PAD.l * ref, PAD.t * ref, ref, pose.still ? pose : { ...pose, t: step / 8 });
   }
+  const smooth = ctx.imageSmoothingQuality;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(sp.c, x - PAD.l * size, y - PAD.t * size, (PAD.l + PAD.r) * size, (PAD.t + PAD.b) * size);
+  ctx.imageSmoothingQuality = smooth;
   if (now - sweptAt > 2000) { sweptAt = now; for (const [k, v] of sprites) if (now - v.used > 3000) sprites.delete(k); }
 }
 

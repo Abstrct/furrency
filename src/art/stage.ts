@@ -22,22 +22,27 @@ const reduced = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduce
  * hunt map: when its frames come too slowly it steps the resolution down; given steady headroom it
  * steps back up, never to a step that already proved too slow there. Steps are remembered per device. */
 const STEPS = [2, 1.75, 1.5, 1.25, 1, 0.85, 0.7];
-const QKEY = 'furrency.stage.scale.v2';
+// v3: steps saved before the did-it-help check could leave a place stuck soft; start those over
+const QKEY = 'furrency.stage.scale.v3';
 const deviceMax = () => Math.min(2, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1);
 // localStorage 'furrency.stage.pin' = '2' (or 1, 1.5…) holds every place there with no governor: for testing
 const PIN = (() => { try { const v = Number(localStorage.getItem('furrency.stage.pin')); return v > 0 ? v : 0; } catch { return 0; } })();
 const saved: Record<string, number> = (() => { try { return JSON.parse(localStorage.getItem(QKEY) || '{}') || {}; } catch { return {}; } })();
 
-interface Quality { scale: number; tooSlow: number; sum: number; n: number; slow: number; since: number; good: number; listeners: Set<() => void> }
+interface Quality { scale: number; tooSlow: number; floor: number; trial: { from: number; avg: number; dropped: number } | null; sum: number; n: number; slow: number; since: number; good: number; listeners: Set<() => void> }
 const places = new Map<string, Quality>();
 function qualityOf(place: string): Quality {
   let q = places.get(place);
   if (!q) {
     const v = Number(saved[place]);
-    q = { scale: PIN || (v > 0 ? Math.min(v, deviceMax()) : deviceMax()), tooSlow: Infinity, sum: 0, n: 0, slow: 0, since: 0, good: 0, listeners: new Set() };
+    q = { scale: PIN || (v > 0 ? Math.min(v, deviceMax()) : deviceMax()), tooSlow: Infinity, floor: 0, trial: null, sum: 0, n: 0, slow: 0, since: 0, good: 0, listeners: new Set() };
     places.set(place, q);
   }
   return q;
+}
+function remember(place: string, scale: number) {
+  saved[place] = scale;
+  try { localStorage.setItem(QKEY, JSON.stringify(saved)); } catch { /* private mode: this visit only */ }
 }
 /** Feed one frame interval (seconds); steps the place's resolution when the trend is clear. */
 function govern(place: string, q: Quality, dt: number, now: number) {
@@ -49,12 +54,22 @@ function govern(place: string, q: Quality, dt: number, now: number) {
   const avg = q.sum / q.n, dropped = q.slow / q.n;
   q.sum = 0; q.n = 0; q.slow = 0; q.since = now;
   const i = STEPS.findIndex((x) => x <= q.scale + 1e-6);
-  let next = q.scale;
-  // under ~40 fps, or uneven: more than one frame in eight dropped reads as sluggish even at a fair average
-  if (avg > 1 / 40 || dropped > 0.125) {
+  let next = q.scale, keep = true;
+  // the second after a step down: did fewer pixels make faster frames? When the time goes elsewhere
+  // (the howl hashing on the GPU, another busy tab) they don't, and a softer picture buys nothing:
+  // go back up and stop lowering this place for the rest of the visit
+  if (q.trial) {
+    const t = q.trial; q.trial = null;
+    if (avg > t.avg * 0.85 && dropped > t.dropped * 0.6) { q.floor = t.from; q.tooSlow = Infinity; next = t.from; keep = false; }
+    else remember(place, q.scale);   // it helped: start here next visit
+  } else if (avg > 1 / 40 || dropped > 0.125) {
+    // under ~40 fps, or uneven: more than one frame in eight dropped reads as sluggish even at a fair average
     q.good = 0;
-    q.tooSlow = Math.min(q.tooSlow, q.scale);
-    if (i >= 0 && i < STEPS.length - 1) next = STEPS[i + 1];
+    if (i >= 0 && i < STEPS.length - 1 && STEPS[i + 1] >= q.floor) {
+      q.tooSlow = Math.min(q.tooSlow, q.scale);
+      q.trial = { from: q.scale, avg, dropped };
+      next = STEPS[i + 1];
+    }
   } else if (avg < 1 / 55 && dropped < 0.03 && ++q.good >= 5) {   // five steady seconds: try one step up
     q.good = 0;
     const up = i > 0 ? STEPS[i - 1] : q.scale;
@@ -62,8 +77,8 @@ function govern(place: string, q: Quality, dt: number, now: number) {
   }
   if (next !== q.scale) {
     q.scale = next;
-    saved[place] = next;
-    try { localStorage.setItem(QKEY, JSON.stringify(saved)); } catch { /* private mode: this visit only */ }
+    // only a step that proved itself is remembered (a trial is saved once the next second confirms it)
+    if (!q.trial || !keep) remember(place, next);
     for (const f of q.listeners) f();
   }
 }
