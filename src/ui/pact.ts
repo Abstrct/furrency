@@ -13,6 +13,13 @@ import { txq } from '../wallet/queue';
 import { claimJob, releaseClaim } from '../core/claims';
 import { audio } from '../core/audio';
 import { kinIcon } from './portrait';
+import { pow } from '../pow/pow';
+import { roster } from '../net/roster';
+import { nameProblem as checkName } from '../game/names';
+import { LCD_URL } from '../chain/lcd';
+
+/** Which network this build plays: a test chain carries no money. */
+const NET = (() => { try { const host = new URL(LCD_URL).hostname; return /^(127\.|localhost|\[::1\])/.test(host) ? 'DEVNET' : /test/i.test(host) ? 'TESTNET' : 'MAINNET'; } catch { return 'TESTNET'; } })();
 
 let open: HTMLElement | null = null;
 
@@ -22,12 +29,9 @@ const LAST = ['paw', 'tail', 'fur', 'mane', 'claw', 'whisk', 'fang', 'tuft', 'sn
 const pick = <T>(a: T[]) => a[Math.floor(Math.random() * a.length)];
 const clanOf = (id: string) => clanName(id, guildsNow()?.find((g) => g.id === id)?.meta?.name);
 
-function nameProblem(n: string) {
-  if (!n) return 'empty';
-  if (/[^A-Za-z0-9_-]/.test(n)) return 'A-Z 0-9 _ - ONLY';
-  if ((n.match(/[A-Za-z0-9]/g) || []).length < 3) return '3+ LETTERS';
-  return '';
-}
+/** Every name already out there: the roster and the chiefs this client has read. */
+const takenNames = () => [...(roster.roster?.chiefs || []).map((c) => c.name), ...[...empire.players.values()].map((p) => p.name)];
+const nameProblem = (n: string) => checkName(n, takenNames());
 
 export function openPact(start?: unknown) {
   if (open) return;
@@ -217,12 +221,19 @@ export function openPact(start?: unknown) {
           h('div', null, h('dt', null, 'CLAN'), h('dd', null, clanOf(p?.guildId || ''))),
           h('div', null, h('dt', null, 'WORDS'), h('dd', { style: { color: wallet.backedUp ? '#1a8a1a' : 'var(--pink)' } }, wallet.backedUp ? 'KEPT' : 'NOT KEPT')),
           h('div', null, h('dt', null, 'DEN'), h('dd', null, (p?.planet?.Planet.name || (p?.planetId ? 'YOURS' : '—')).toUpperCase())),
-          h('div', null, h('dt', null, 'KIN'), h('dd', null, String(p ? [...p.structs.values()].filter((s) => !s.destroyed).length : 0)))),
+          h('div', null, h('dt', null, 'KIN'), h('dd', null, String(p ? [...p.structs.values()].filter((s) => !s.destroyed).length : 0))),
+          // what a skeptic asks first: where the key lives, whether this is money, what runs on their machine
+          h('div', null, h('dt', null, 'KEY'), h('dd', null, 'THIS BROWSER')),
+          h('div', null, h('dt', null, 'NET'), h('dd', { style: { color: NET === 'MAINNET' ? 'var(--pink)' : '#1a8a1a' } }, NET === 'MAINNET' ? 'MAINNET' : `${NET} · NO MONEY`))),
+        h('div', { class: 'row', style: { marginTop: '10px', gap: '8px', alignItems: 'center' } },
+          glyph('howl', 20, '#0A0612'), h('span', { class: 'tag' }, 'HOWL · THIS COMPUTER'),
+          h('button', { type: 'button', class: 'cbtn small ' + (pow.settings.enabled ? 'violet' : 'paper'), 'aria-pressed': String(pow.settings.enabled), onclick: () => { pow.save({ enabled: !pow.settings.enabled }); paint(); } }, pow.settings.enabled ? 'ON' : 'OFF')),
         h('details', { class: 'mark', open: markOpen, ontoggle: (e: Event) => { markOpen = (e.target as HTMLDetailsElement).open; } }, h('summary', { class: 'tag' }, 'PAW MARK'), h('p', { style: { fontFamily: 'var(--ui)', fontSize: '13px', wordBreak: 'break-all', margin: '6px 0 0' } }, a.address)),
         h('div', { class: 'row', style: { marginTop: '12px' } },
           h('button', { type: 'button', class: wallet.backedUp ? 'cbtn' : 'cbtn pink', onclick: () => void reveal('words') }, glyph('words', 18, wallet.backedUp ? '#0A0612' : '#FFF8E7'), wallet.backedUp ? 'WORDS' : 'KEEP WORDS'),
           location.hash === '#/den' ? null : h('a', { class: 'cbtn yellow', href: '#/den', onclick: close }, glyph('den', 18, '#0A0612'), 'DEN'),
-          h('button', { type: 'button', class: 'cbtn small paper', style: { marginLeft: 'auto' }, onclick: async () => {
+          wallet.deviceSealed ? null : h('button', { type: 'button', class: 'cbtn small paper', style: { marginLeft: 'auto' }, onclick: () => { wallet.lock(); close(); } }, glyph('lock', 16, '#0A0612'), 'LOCK'),
+          h('button', { type: 'button', class: 'cbtn small paper', style: { marginLeft: wallet.deviceSealed ? 'auto' : '0' }, onclick: async () => {
             if (await confirmBox('FORGET PAW?', ['WORDS = WAY BACK'], 'FORGET')) { wallet.forget(); close(); }
           } }, glyph('release', 16, '#0A0612'), 'FORGET')));
       return;
@@ -275,10 +286,10 @@ export function openPact(start?: unknown) {
     const go = h('button', { type: 'button', class: 'cbtn big yellow', style: { width: '100%', marginTop: '16px' }, onclick: join }) as HTMLButtonElement;
     const check = () => {
       const why = nameProblem(name);
-      rule.textContent = why === 'empty' ? '3–20 · A-Z 0-9' : why || 'GOOD NAME';
+      rule.textContent = why === 'empty' ? '3–20 · A-Z 0-9 _ -' : why || 'GOOD NAME';
       rule.style.color = why && why !== 'empty' ? 'var(--pink)' : !why ? '#1a8a1a' : '';
       go.disabled = busy || !clan || !!why;
-      clear(go); go.append(glyph('clan', 28, '#0A0612'), busy ? 'JOINING…' : !clan ? 'PICK CLAN' : why ? 'NAME FIRST' : 'JOIN · ROAM');
+      clear(go); go.append(glyph('clan', 28, '#0A0612'), busy ? 'JOINING…' : !clan ? 'PICK CLAN' : why === 'empty' ? 'NAME FIRST' : why ? why : 'JOIN · ROAM');
     };
     const nameIn = h('input', { id: 'chief-name', value: name, maxLength: 20, autocomplete: 'nickname', placeholder: 'VexTail', 'aria-describedby': 'name-rule', oninput: (e: Event) => {
       const el = e.target as HTMLInputElement;

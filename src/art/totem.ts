@@ -1,7 +1,7 @@
 /* Totems: the den's standing things. The Dig Mole and Forge Badger are beasts at work (beast.ts)
  * with their mound and forge in front; the rest are carved poles, moons, burrows, thorns, crystals
  * and a sun tree, drawn in the same ink. Anchor: bottom centre; `size` px per 100 units. */
-import { INK, PAPER, ell, mirror, mix, paint, shape, spikes, stroke, wob, zig, type P } from './ink';
+import { INK, PAPER, ctx2d, ell, mirror, mix, paint, shape, spikes, stroke, wob, zig, type P } from './ink';
 import { drawBeast, type Pose } from './beast';
 import { lore } from '../lore';
 
@@ -38,7 +38,7 @@ export function drawKin(ctx: CanvasRenderingContext2D, typeId: number, x: number
   const step = Math.floor(pose.t * 8 + sp.phase);
   if (sp.step !== step) {
     sp.step = step;
-    const sctx = sp.c.getContext('2d')!;
+    const sctx = ctx2d(sp.c);
     const ref = res / sc;   // drawn at the caller's own scale, so line-width floors land exactly as before
     sctx.setTransform(1, 0, 0, 1, 0, 0); sctx.clearRect(0, 0, sp.c.width, sp.c.height);
     sctx.setTransform(sc, 0, 0, sc, 0, 0);

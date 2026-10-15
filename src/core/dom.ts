@@ -57,8 +57,12 @@ export function clear(el: Element) { while (el.firstChild) el.removeChild(el.fir
 export function stable<T extends HTMLElement>(box: T, fill: (b: T) => void) {
   const tmp = box.cloneNode(false) as T;
   fill(tmp);
-  if (tmp.innerHTML === box.innerHTML && tmp.className === box.className && tmp.hidden === box.hidden && tmp.getAttribute('style') === box.getAttribute('style')) { carry(tmp, box); return; }
-  patchAttrs(box, tmp);
+  // the box's own handlers were given when it was made; the repaint only owns what is inside it
+  if (tmp.innerHTML === box.innerHTML && tmp.className === box.className && tmp.hidden === box.hidden && tmp.getAttribute('style') === box.getAttribute('style')) {
+    for (let i = 0; i < tmp.childNodes.length && i < box.childNodes.length; i++) carry(tmp.childNodes[i], box.childNodes[i]);
+    return;
+  }
+  patchAttrs(box, tmp, false);
   box.hidden = tmp.hidden;
   patchKids(box, tmp);
 }
@@ -73,9 +77,10 @@ function carry(from: Node, to: Node) {
   for (let i = 0; i < a.length && i < b.length; i++) carry(a[i], b[i]);
 }
 
-function patchAttrs(el: Element, next: Element) {
+function patchAttrs(el: Element, next: Element, handlers = true) {
   for (const { name } of [...el.attributes]) if (!next.hasAttribute(name)) el.removeAttribute(name);
   for (const { name, value } of [...next.attributes]) if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+  if (!handlers) return;
   const n = next as unknown as { [ON]?: Handlers }, o = el as unknown as { [ON]?: Handlers };
   if (o[ON]) for (const type of Object.keys(o[ON])) if (!n[ON]?.[type]) delete o[ON][type];
   if (n[ON]) for (const [type, fn] of Object.entries(n[ON])) listen(el, type, fn);

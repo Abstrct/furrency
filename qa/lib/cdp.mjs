@@ -34,6 +34,10 @@ export async function launchChrome({ port = 9222 + Math.floor(Math.random() * 50
     ...extraArgs, 'about:blank',
   ].filter(Boolean);
   const proc = spawn(findChrome(), args, { stdio: ['ignore', 'ignore', 'pipe'] });
+  // a script that crashes or is interrupted must not leave a headless Chrome hashing in the background
+  const reap = () => { try { proc.kill('SIGKILL'); } catch { /* gone */ } };
+  process.once('exit', reap);
+  for (const sig of ['SIGINT', 'SIGTERM']) process.once(sig, () => { reap(); process.exit(130); });
   let stderr = '';
   proc.stderr.on('data', (d) => { stderr += d; if (stderr.length > 20000) stderr = stderr.slice(-10000); });
   let version = null;

@@ -26,6 +26,10 @@ class LiveFeed {
   lastBlockAt = 0;
   /** Running estimate of seconds per block. */
   blockTime = 6;
+  /** Seconds per block over the last ~2000 blocks, from the chain's own timestamps: steady, for turning
+   * block counts into hours (idle times) without the drift of the running estimate. 0 until read. */
+  steadyBlockTime = 0;
+  private steadyAt = 0;
   private ws: WebSocket | null = null;
   private backoff = 1000;
   private started = false;
@@ -49,6 +53,21 @@ class LiveFeed {
     }, 10000);
   }
 
+  /** Read the long-run block time (every 10 minutes at most). */
+  async steady(lcdUrl: string) {
+    if (Date.now() - this.steadyAt < 600_000 || !this.height) return;
+    this.steadyAt = Date.now();
+    try {
+      const get = async (h: number | 'latest') => {
+        const r = await fetch(`${lcdUrl}/cosmos/base/tendermint/v1beta1/blocks/${h}`, { signal: AbortSignal.timeout(10000) });
+        const j = await r.json();
+        return { h: Number(j.block.header.height), t: Date.parse(j.block.header.time) };
+      };
+      const a = await get('latest');
+      const b = await get(Math.max(1, a.h - 2000));
+      if (a.h > b.h && a.t > b.t) this.steadyBlockTime = (a.t - b.t) / 1000 / (a.h - b.h);
+    } catch { this.steadyAt = Date.now() - 540_000; /* try again in a minute */ }
+  }
   onBlock(f: Listener<LiveBlock>) { this.blockL.add(f); return () => this.blockL.delete(f); }
   onTx(f: Listener<LiveTx>) { this.txL.add(f); return () => this.txL.delete(f); }
   onState(f: Listener<LinkState>) { this.stateL.add(f); f(this.state); return () => this.stateL.delete(f); }

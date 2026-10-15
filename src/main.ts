@@ -1,6 +1,7 @@
 /* Furrency boots: the net's heartbeat (live), the paw (wallet), the chiefs it commands (empire), the
  * howl engine (pow) and the deed queue (txq) — then the frame and the screens, routed by hash. */
 import './styles.css';
+import { LCD_URL } from './chain/lcd';
 import { live } from './chain/live';
 import { wallet } from './wallet/wallet';
 import { empire } from './game/empire';
@@ -67,7 +68,12 @@ async function route() {
   current.enter?.();
   // a new place takes the keyboard's focus, so Tab starts inside it
   shell.slot.setAttribute('tabindex', '-1');
-  if (!document.querySelector('.veil')) shell.slot.focus({ preventScroll: true });
+  // focus lands where the keys can work: a scrolling page takes focus itself, so Space, PageDown and the
+  // arrows scroll it (GLYPHS, KIN); other places focus the slot
+  if (!document.querySelector('.veil')) {
+    const scroller = shell.slot.querySelector<HTMLElement>('.scrolls');
+    if (scroller) { scroller.tabIndex = -1; scroller.focus({ preventScroll: true }); } else shell.slot.focus({ preventScroll: true });
+  }
   document.title = current.title ? `${current.title} · Furrency` : 'Furrency — Be the Alpha · a fur-beast strategy game on the Structs network';
 }
 
@@ -100,6 +106,8 @@ txq.onSettled((j) => {
 async function boot() {
   bootStep.textContent = 'LINK';
   live.start();
+  // the long-run block time, for steady idle hours (re-read every 10 minutes)
+  live.onBlock(() => { void live.steady(LCD_URL); });
   bootStep.textContent = 'PAW';
   await Promise.race([wallet.restore(), new Promise((r) => setTimeout(r, 5000))])
     .catch((e) => toast(tag((e as Error).message), 'enemy', 9000, { label: 'PAW', run: () => openPact() }));

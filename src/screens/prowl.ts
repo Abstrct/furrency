@@ -4,6 +4,7 @@
  * Always on screen: what wins (fell their king, then snatch), what this blow will likely do, and what
  * every blow did, as the chain tells it. A wise blow is picked for you until you pick. */
 import { h, clear, toast, keepFocus, stable } from '../core/dom';
+import { leaveDen } from '../ui/alarms';
 import type { Ctx, Screen } from './types';
 import { mountStage } from '../art/stage';
 import { ProwlScene, type Fighter } from '../scenes/prowl';
@@ -113,9 +114,12 @@ export function prowl(ctx: Ctx): Screen {
     if (full) { say(full); return; }
     if (!wallet.unlocked) { say('PAW LOCKED'); return; }
     const k = wyrmOf(p);
-    if (!k || !alive(k)) { say('NO KING'); return; }
+    if (!k || !alive(k)) { note = 'NO KING'; toast('NO KING · CALL ONE', 'warn', 7000, { label: 'DEN', run: () => ctx.go('#/den') }); paint(); return; }
     if (!k.online) { say('KING NAPS'); return; }
-    try { act.fleetMove(p, f.planetId); scene.fx.word('PROWL!', canvas.clientWidth * 0.5, canvas.clientHeight * 0.45, '#FFE53B', 72, '#FF2E88'); audio.pop(); } catch (e) { say((e as Error).message); }
+    void leaveDen(p).then((go) => { if (go) send(p, f.planetId); });
+  }
+  function send(p: PlayerState, planetId: string) {
+    try { act.fleetMove(p, planetId); scene.fx.word('PROWL!', canvas.clientWidth * 0.5, canvas.clientHeight * 0.45, '#FFE53B', 72, '#FF2E88'); audio.pop(); } catch (e) { say((e as Error).message); }
   }
   function goHome() { const p = me(); if (!p) return; try { act.fleetMove(p, p.planetId); audio.pop(); } catch (e) { say((e as Error).message); } }
   function guardFor(p: PlayerState, w: OwnedStruct): OwnedStruct | null {
@@ -210,7 +214,10 @@ export function prowl(ctx: Ctx): Screen {
   const who = (id: string, typeId: number, ownerId?: string) => {
     const o = ownerId || ownerOf(id);
     const mine = !!me() && o === me()!.playerId;
-    return `${mine ? 'YOUR' : 'THEIR'} ${beastName(typeId || empire.ownerOf(id)?.structs.get(id)?.typeId || 0)}`;
+    // a fight between two others: say whose, by name, not "THEIR → THEIR"
+    const op = o ? empire.players.get(o) : undefined;
+    const side = mine ? 'YOUR' : op ? `${playerName(op)}'S` : o ? `CHIEF ${o.split('-')[1] || o}'S` : 'THEIR';
+    return `${side} ${beastName(typeId || empire.ownerOf(id)?.structs.get(id)?.typeId || 0)}`;
   };
   function applyBlow(bw: Blow, height?: number) {
     const find = (id: string) => { for (const pl of empire.players.values()) { const st = pl.structs.get(id); if (st) return st; } return null; };
@@ -319,7 +326,7 @@ export function prowl(ctx: Ctx): Screen {
     if (fc) {
       const odds = h('div', { class: 'odds' },
         h('span', { style: { '--c': 'var(--cyan)' } }, `HIT ${pct(fc.land)}`),
-        h('span', { style: { '--c': 'var(--paper)' } }, `DMG ${fc.dmg.min === fc.dmg.max ? fc.dmg.max : `${fc.dmg.min}-${fc.dmg.max}`}`),
+        h('span', { style: { '--c': 'var(--paper)' } }, `${fc.guard ? `${beastName(fc.guard.typeId)} −` : 'DMG '}${fc.dmg.min === fc.dmg.max ? fc.dmg.max : `${fc.dmg.min}-${fc.dmg.max}`}`),
         h('span', { style: { '--c': 'var(--yellow)' } }, `FELL ${pct(fc.fell)}`),
         fc.backMax ? h('span', { style: { '--c': 'var(--orange)' } }, `BACK −${fc.backMax}`) : null,
         fc.guard ? h('span', { style: { '--c': 'var(--violet)' } }, `${beastName(fc.guard.typeId)} BLOCKS`) : null);
@@ -336,6 +343,7 @@ export function prowl(ctx: Ctx): Screen {
     if (!inFight()) {
       const w = wyrmOf(p), g = w && alive(w) && !unguardedOk ? guardFor(p, w) : null;
       if (g && !guarding) { word = 'GUARD KING'; sub = beastName(g.typeId); color = 'cyan'; fill = 1; }
+      else if (skyFull(f.planet, p)) { word = skyFull(f.planet, p)!; sub = 'PACK THERE · WAIT'; color = 'paper'; fill = 0; }
       else { word = 'PROWL'; sub = f.ore ? shards(f.ore) : ''; color = 'pink'; fill = 1; }
     } else if (job && ['queued', 'waiting'].includes(job.status)) { word = 'WAIT'; sub = job.waitReason ? tag(job.waitReason) : 'PULSE'; color = 'paper'; }
     else if (job) { word = 'POUNCING…'; color = 'orange'; }
@@ -343,7 +351,7 @@ export function prowl(ctx: Ctx): Screen {
     if (armed && armed.key === `${atk}>${mark}`) { word = 'SURE? AGAIN'; color = 'pink'; }
     const btn = h('button', { type: 'button', 'data-key': 'big', class: `cbtn big ${color}`, style: { position: 'relative', overflow: 'hidden', minWidth: '320px' }, onclick: press, disabled: !wallet.unlocked && !!wallet.active?.playerId ? false : false },
       h('span', { style: { position: 'absolute', left: '0', bottom: '0', height: '8px', width: `${fill * 100}%`, background: 'var(--ink)' } }),
-      glyph(word.startsWith('PROWL') ? 'prowl' : word.startsWith('GUARD') ? 'guard' : word.startsWith('LEAP') ? 'leap' : 'pounce', 36, color === 'pink' ? '#FFF8E7' : '#0A0612'),
+      glyph(word.startsWith('PROWL') ? 'prowl' : word.startsWith('SKY') || word === 'WAIT' ? 'wait' : word.startsWith('GUARD') ? 'guard' : word.startsWith('LEAP') ? 'leap' : 'pounce', 36, color === 'pink' ? '#FFF8E7' : '#0A0612'),
       h('span', null, word), sub ? h('span', { class: 'cost' }, sub) : null);
     const row = h('div', { class: 'row center' }, btn);
     if (inFight()) row.append(h('button', { type: 'button', class: `cbtn ${fightOn ? 'green' : 'ink'}`, 'aria-pressed': String(fightOn), onclick: () => { fightOn = !fightOn; fightNote = ''; if (fightOn) chose = false; paint(); } }, glyph(fightOn ? 'howl' : 'pounce', 22, fightOn ? '#0A0612' : '#FFF8E7'), fightOn ? 'AUTO ON' : 'AUTO'));

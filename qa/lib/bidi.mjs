@@ -29,6 +29,9 @@ export async function launchFirefox({ headless = true, width = 1440, height = 90
   writeFileSync(join(profile, 'user.js'), Object.entries(all).map(([k, v]) => `user_pref(${JSON.stringify(k)}, ${JSON.stringify(v)});`).join('\n') + '\n');
   const args = ['--profile', profile, '--no-remote', '--new-instance', `--remote-debugging-port=${port}`, `--width=${width}`, `--height=${height}`, ...(headless ? ['--headless'] : []), 'about:blank'];
   const proc = spawn(findFirefox(), args, { stdio: ['ignore', 'ignore', 'pipe'], env: { ...process.env, MOZ_REMOTE_SETTINGS_DEVTOOLS: '1' } });
+  const reap = () => { try { proc.kill('SIGKILL'); } catch { /* gone */ } };
+  process.once('exit', reap);
+  for (const sig of ['SIGINT', 'SIGTERM']) process.once(sig, () => { reap(); process.exit(130); });
   let stderr = ''; proc.stderr.on('data', (d) => { stderr += d; if (stderr.length > 20000) stderr = stderr.slice(-10000); });
   let ws = null;
   for (let i = 0; i < 150 && !ws; i++) {

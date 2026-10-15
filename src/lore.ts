@@ -116,7 +116,8 @@ export const fmtPulse = fmtBreath;
 /** Beats (blocks) as a wait. A beat is about six seconds. */
 export function bellsAsTime(n: number) {
   // beats are as long as the chain makes them (about 6 s on the testnet, far less on a devnet)
-  const s = Math.max(0, n) * (live.blockTime > 0 ? live.blockTime : 6);
+  // the long-run average when known: a running estimate would make the same count read 10H, then 11H
+  const s = Math.max(0, n) * (live.steadyBlockTime || (live.blockTime > 0 ? live.blockTime : 6));
   if (s < 60) return `${Math.max(5, Math.round(s / 5) * 5)}S`;
   const m = s / 60;
   if (m < 90) return `${Math.round(m)}M`;

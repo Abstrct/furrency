@@ -412,7 +412,8 @@ function howlWaves(ctx: CanvasRenderingContext2D, x: number, y: number, t: numbe
   }
   ctx.save();
   ctx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 6);
-  letter(ctx, 'AWOOO', x, y - 70 - Math.sin(t * 2) * 6, 22, '#B89BFF', { shadow: 'none', outline: 3 });
+  // beside the door, not above it: the king stands right over the door and the word sat on his face
+  letter(ctx, 'AWOOO', x + 150, y + 10 - Math.sin(t * 2) * 6, 22, '#B89BFF', { shadow: 'none', outline: 3, rot: -0.08 });
   ctx.restore();
 }
 

@@ -72,6 +72,17 @@ export class HuntScene implements Scene {
     this.goal.x = d.x; this.goal.y = d.y; this.goal.z = Math.max(this.goal.z, 1.6);
   }
 
+  /** New side panels (the prey card opening or closing) without moving the map: the camera shifts by
+   * exactly what the view's centre moved, so the den under the pointer stays under it. */
+  setInset(next: { l: number; r: number }) {
+    if (next.l === this.inset.l && next.r === this.inset.r) return;
+    if (this.w >= 900) {
+      const shift = ((next.l - next.r) - (this.inset.l - this.inset.r)) / 2;   // the centre's move, in px
+      this.cam.x += shift / this.cam.z; this.goal.x += shift / this.goal.z;
+    }
+    this.inset = next;
+  }
+
   private toScreen(x: number, y: number) {
     const narrow = this.w < 900;
     const cx = narrow ? this.w / 2 : (this.inset.l + this.w - this.inset.r) / 2;

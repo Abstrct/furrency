@@ -19,6 +19,30 @@ function hash(n: number) { n = Math.imul(n ^ (n >>> 15), 0x2c1b3c6d); n = Math.i
 /** Deterministic wobble for point i of a shape with seed `seed`, in [-1, 1]. */
 export function wob(seed: number, i: number, axis: number) { return hash(seed * 7919 + i * 131 + axis * 17 + boilTick * 104729) * 2 - 1; }
 
+/* ── Canvases ────────────────────────────────────────────────────────── */
+
+/** Is the browser drawing "GPU" canvases with a software GPU (SwiftShader, llvmpipe: GPUs Chrome won't
+ * trust, virtual machines, remote desktops)? There every drawing call costs dearly, and a plain CPU canvas
+ * runs the same art about 15× faster. Asked once, from the WebGL renderer's name. */
+let softGpu: boolean | null = null;
+export function softwareGpu(): boolean {
+  if (softGpu != null) return softGpu;
+  softGpu = false;
+  try {
+    const gl = document.createElement('canvas').getContext('webgl') as WebGLRenderingContext | null;
+    if (!gl) return (softGpu = false);
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    const name = String(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    softGpu = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(name);
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+  } catch { /* no WebGL: the browser picks */ }
+  return softGpu;
+}
+/** Every 2D canvas in the game: on a software GPU, asked for as a CPU canvas (willReadFrequently). */
+export function ctx2d(c: HTMLCanvasElement, o: CanvasRenderingContext2DSettings = {}): CanvasRenderingContext2D {
+  return c.getContext('2d', softwareGpu() ? { ...o, willReadFrequently: true } : o)!;
+}
+
 /* ── Shapes ──────────────────────────────────────────────────────────── */
 
 /** A closed (or open) path through points: sharp points are corners, others are smoothed. */
@@ -113,7 +137,7 @@ export function halftone(ctx: CanvasRenderingContext2D, color = INK, cell = 7, r
   if (patterns.has(key)) return patterns.get(key)!;
   const c = document.createElement('canvas');
   c.width = c.height = cell * 2;
-  const g = c.getContext('2d')!;
+  const g = ctx2d(c);
   g.fillStyle = alphaOf(color, alpha);
   for (const [x, y] of [[cell / 2, cell / 2], [cell * 1.5, cell * 1.5]]) { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); }
   const pat = ctx.createPattern(c, 'repeat');

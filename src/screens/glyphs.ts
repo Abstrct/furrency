@@ -28,6 +28,8 @@ const TILES: [GlyphName, string, string, string][] = [
   ['king', 'KING', 'PACK LEADER', 'var(--yellow)'],
   ['fur', 'FUR', 'LIFE', 'var(--pink)'],
   ['den', 'DEN', 'HOME', 'var(--yellow)'],
+  ['totem', 'TOTEM', 'DEN KIN · STAYS', 'var(--yellow)'],
+  ['hunt', 'HUNT', 'FIND PREY', 'var(--cyan)'],
   ['pack', 'PACK', 'YOUR KIN', 'var(--cyan)'],
   ['clan', 'CLAN', 'FRIENDS · GLOW', 'var(--pink)'],
   ['sun', 'SUN', 'CLAN GLOW', 'var(--yellow)'],

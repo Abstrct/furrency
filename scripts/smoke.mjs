@@ -40,7 +40,8 @@ const ROUTES = [
   { hash: '#/prowl', online: null },
   { hash: '#/glow', online: null },
   { hash: '#/kin', online: /SUN LION/ },
-  { hash: '#/glyphs', online: null },
+  // the top bar's paw button must open the join panel (a repaint once stripped its click)
+  { hash: '#/glyphs', online: null, press: '.paw-btn', opens: '.veil' },
 ];
 const DESKTOP = { name: 'desktop', w: 1440, h: 900, mobile: false };
 const PHONE = { name: 'phone', w: 390, h: 844, mobile: true };
@@ -129,6 +130,10 @@ async function run({ route, view, mode }) {
         text: document.body.innerText,
       };
     })()`);
+    if (route.press) {
+      const opened = await page.eval(`(async () => { document.querySelector(${JSON.stringify(route.press)})?.click(); await new Promise((r) => setTimeout(r, 600)); return !!document.querySelector(${JSON.stringify(route.opens)}); })()`);
+      if (!opened) problems.push(`${route.press} did not open ${route.opens}`);
+    }
     for (const e of page.exceptions) problems.push('uncaught: ' + e.text.split('\n')[0]);
     for (const c of page.console) if (c.level === 'error' && !theirs(c.text)) problems.push('error: ' + c.text.slice(0, 180));
     if (outside.length > seen) problems.push('asked outside the base path: ' + [...new Set(outside.slice(seen))].join(', '));

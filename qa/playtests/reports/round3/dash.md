@@ -6,7 +6,7 @@ One thumb, 390x844 phone viewport the whole time, between classes. I timed every
 
 I went through JOIN (new paw, skipped the words, typed a name, took the Devnet clan), called a Dig Mole, then a Forge Badger, turned the HOWL voices up, hunted, got refused prowling FANG2CLAW, prowled RUCKUS, snatched 9 shards, lost my king and every shard to a payback raid, and tried the FIGHT / PROWL payback.
 
-That was 56 lab actions over about 70 minutes of wall clock. From about minute 21 on, each single action took 2 to 12 minutes to return.
+That was 55 lab actions over about 75 minutes of wall clock. From about minute 21 on, each single action took 2 to 12 minutes to return.
 
 **Timings (action # / wall clock from opening the title screen)**
 
@@ -39,7 +39,7 @@ That was 56 lab actions over about 70 minutes of wall clock. From about minute 2
      3. Get some shards so FORGE starts.
      4. Do anything: `{"wait":60000}`, `{"tapxy":[200,180]}`, a plain `look`, `{"click":"FIGHT"}`, `{"click":"PROWL 13 SHARD"}`.
    - **Expected:** a tap answers in under a second, with hashing kept in the background.
-   - **Actual:** the 60 s wait took about 4.5 min (#49–50). A tap took about 5.5 min (#51). A plain look took 4 min 0 s. FIGHT took 3 min 10 s (#53). PROWL took **12 min 07 s** (#54). Navigating back to the den (#55) took over 10 min.
+   - **Actual:** the 60 s wait took about 4.5 min (#49–50). A tap took about 5.5 min (#51). A plain look took 4 min 0 s. FIGHT took 3 min 10 s (#53). PROWL took **12 min 07 s** (#54). Navigating back to the den (#55, `{"goto":"#/den"}`) **never returned**: I abandoned it after 21+ minutes, so I couldn't confirm whether my king ever came back.
    - **Caveat:** 10 testers share this machine, so CPU contention may contribute. The lab's own `/testers` endpoint still answered in 1 ms, so the stall is in my game page. On a real phone this is an "app frozen, close it" moment.
    - **Screenshots:** `qa/playtests/shots/dash-032.png`, `dash-034.png`
 

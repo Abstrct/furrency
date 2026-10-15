@@ -27,7 +27,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @keyframes wipe { 0% { transform: translateX(-105%) skewX(-12deg); } 45%, 55% { transform: translateX(0) skewX(-12deg); } 100% { transform: translateX(105%) skewX(-12deg); } }
 a { color: inherit; }
 :focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; box-shadow: 0 0 0 7px var(--cyan) !important; }
-.kinrow:focus-visible, .prey:focus-visible { outline-offset: -5px; }
+/* rows inside scrolling lists draw their ring inside themselves: the list's edge would cut an outer one */
+.kinrow:focus-visible, .prey:focus-visible, .scrolls .callcard:focus-visible { outline: 3px solid var(--ink); outline-offset: -6px; box-shadow: inset 0 0 0 9px var(--cyan) !important; }
+.scrolls:focus-visible, .screen.scrolls:focus { outline: none; box-shadow: none !important; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* ── Boot ─────────────────────────────────────────────── */
@@ -333,7 +335,8 @@ body[data-route="gate"] .top, body[data-route="gate"] .rail { display: none; }
   .dock .cbtn { min-width: 0; font-size: 18px; padding: 4px 8px; }
   .dock .cbtn small { display: none; }
   .omens { top: 74px; max-width: calc(100% - 24px); }
-  .side { width: auto; left: 12px !important; right: 12px !important; top: auto; height: 44%; }
+  .side { width: auto; left: 12px !important; right: 12px !important; top: auto; height: 56%; }
+  .hunt-legend { display: none; }   /* phone: room for prey rows instead (the map says it by colour) */
   .side.r { top: auto; bottom: 12px; height: auto; max-height: 62%; overflow-y: auto; z-index: 14; }
   .side.r:not([hidden]) ~ .side.l, .side.l:has(~ .side.r:not([hidden])) { display: none; }
   .gate-stats { display: none; }

@@ -1,6 +1,7 @@
 /* Hunt: every chief on the network, around their clan's sun. Pick prey, peek at their den, and
  * PROWL — a real MsgFleetMove that sends your pack (and its king) to hang over their den. */
 import { h, clear, toast, keepFocus, stable } from '../core/dom';
+import { leaveDen } from '../ui/alarms';
 import type { Ctx, Screen } from './types';
 import { mountStage } from '../art/stage';
 import { HuntScene, type HuntDen } from '../scenes/hunt';
@@ -10,7 +11,7 @@ import { live } from '../chain/live';
 import { skyFull } from '../realm';
 import { roster, type Roster } from '../net/roster';
 import { guilds, type GuildEntry } from '../guild/directory';
-import { empire } from '../game/empire';
+import { empire, type PlayerState } from '../game/empire';
 import { act } from '../game/actions';
 import { wallet } from '../wallet/wallet';
 import { alive, guardsOf, reach, wyrmOf } from '../game/war';
@@ -19,13 +20,27 @@ import { audio } from '../core/audio';
 
 type Filter = 'all' | 'rich' | 'nap';
 
+/** A chief's name on one line in the card's ~190 px beside the portrait, measured in the display type
+ * itself (30 px at most, 14 at least; a longer name ends in … with the whole name on hover). */
+let meter: CanvasRenderingContext2D | null = null;
+function nameFit(n: string) {
+  meter ||= document.createElement('canvas').getContext('2d');
+  if (!meter) return '20px';
+  meter.font = `400 30px ${getComputedStyle(document.documentElement).getPropertyValue('--title') || 'sans-serif'}`;
+  const w = meter.measureText(n).width || n.length * 30;
+  // the column's own width (container query units): whatever room the card has on this screen
+  return `clamp(14px, calc(${((30 / w) * 100 * 0.97).toFixed(3)}cqi), 30px)`;
+}
+
 export function hunt(ctx: Ctx): Screen {
   const canvas = h('canvas', { class: 'stage' }) as HTMLCanvasElement;
   const search = h('input', { type: 'search', placeholder: 'NAME', 'aria-label': 'Find a chief', autocomplete: 'off', style: { font: '600 18px var(--ui)', padding: '8px 10px', border: '4px solid var(--ink)', width: '100%' } }) as HTMLInputElement;
   const seg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Filter' });
-  const list = h('ul', { class: 'list' });
+  const list = h('ul', { class: 'list',
+    onpointerenter: () => { holdOrder = true; }, onpointerleave: () => { holdOrder = false; paintList(); },
+    onfocusin: () => { holdOrder = true; }, onfocusout: (e: FocusEvent) => { if (!list.contains(e.relatedTarget as Node)) { holdOrder = false; paintList(); } } });
   const foot = h('p', { class: 'tag', style: { margin: '8px 0 0' } });
-  const legend = h('p', { class: 'tag row', style: { margin: '6px 0 0', gap: '10px' } }, h('span', { style: { color: '#c0156a' } }, '● SHARD'), h('span', null, '● NONE'), h('span', { style: { color: '#a07a00' } }, '♛ YOU'), h('span', { style: { color: '#6a4fd0' } }, 'z IDLE'));
+  const legend = h('p', { class: 'tag row hunt-legend', style: { margin: '6px 0 0', gap: '10px' } }, h('span', { style: { color: '#c0156a' } }, '● SHARD'), h('span', null, '● NONE'), h('span', { style: { color: '#a07a00' } }, '♛ YOU'), h('span', { style: { color: '#6a4fd0' } }, 'z IDLE'));
   const left = h('aside', { class: 'panel side l', 'aria-label': 'Prey' }, h('div', { class: 'row between', style: { marginBottom: '8px' } }, h('h2', { style: { fontSize: '30px' } }, 'PREY'), h('span', { class: 'row', style: { gap: '6px' } },
     h('button', { type: 'button', class: 'cbtn small', 'aria-label': 'Zoom out', onclick: () => scene.zoomBy(0.75) }, '−'),
     h('button', { type: 'button', class: 'cbtn small', 'aria-label': 'Zoom in', onclick: () => scene.zoomBy(1.33) }, '+'))), search, h('div', { style: { marginTop: '8px' } }, seg), list, foot, legend);
@@ -34,12 +49,13 @@ export function hunt(ctx: Ctx): Screen {
 
   const scene = new HuntScene();
   const stage = mountStage(canvas, scene, 'hunt');
-  scene.onPick = (id) => choose(id);
+  scene.onPick = (id) => choose(id, false);
 
   let clans = new Map<string, GuildEntry>();
   let filter: Filter = 'all';
   let sel: string | null = ctx.param || null;
   let loaded = false, failed = false, gone = false, goTimer = 0;
+  let holdOrder = false, order: string[] = [];
 
   const isMine = (id: string) => !!wallet.byPlayer(id);
   const pass = (d: { id: string; name: string; ore: number; nap: number }) => {
@@ -54,7 +70,7 @@ export function hunt(ctx: Ctx): Screen {
   function take(r: Roster) {
     if (gone) return;
     loaded = true; failed = false;
-    const dens = r.chiefs.map((c) => ({ id: c.id, name: (c.name || `CHIEF ${c.id.split('-')[1]}`).toUpperCase(), clan: c.guildId || '0-0', ore: c.ore, nap: c.lastAction && live.height ? live.height - c.lastAction : 0, mine: isMine(c.id) }));
+    const dens = r.chiefs.map((c) => ({ id: c.id, name: (c.name || `CHIEF ${c.id.split('-')[1]}`).toUpperCase(), clan: c.guildId || '0-0', ore: c.ore, nap: isMine(c.id) || empire.players.get(c.id)?.fleet?.status === 'away' ? 0 : c.lastAction && live.height ? live.height - c.lastAction : 0, mine: isMine(c.id) }));
     const clanList = [...new Set(dens.map((d) => d.clan))].map((id) => ({ id, name: clanName(id, clans.get(id)?.meta?.name), color: clanColor(id) }));
     scene.set(dens, clanList);
     source = r.source;
@@ -76,9 +92,11 @@ export function hunt(ctx: Ctx): Screen {
     if (id && !isMine(id)) empire.watch(id);
   }
 
-  function choose(id: string | null) {
+  /** `fly`: bring the den to the middle (picked from the list). A den tapped on the map is already
+   * under the finger, so the map stays put. */
+  function choose(id: string | null, fly = true) {
     sel = id; scene.selected = id;
-    if (id) { scene.focus(id); audio.click(); }
+    if (id) { if (fly) scene.focus(id); audio.click(); }
     scout(id);
     paint();
   }
@@ -93,7 +111,11 @@ export function hunt(ctx: Ctx): Screen {
   function fillList(list: HTMLElement) {
     if (!loaded) { list.append(h('li', { class: 'boomtxt', style: { fontSize: '22px' } }, 'SNIFFING…')); return; }
     if (failed && !scene.dens.length) { list.append(h('li', null, h('span', { class: 'refusal' }, 'NET DOWN'))); return; }
-    const rows = scene.dens.filter((d) => pass(d)).sort((a, b) => Number(b.mine) - Number(a.mine) || b.ore - a.ore || b.nap - a.nap).slice(0, 120);
+    // while the pointer is over the list, rows keep their places (a live re-sort would move the row being clicked)
+    const sorted = scene.dens.filter((d) => pass(d)).sort((a, b) => Number(b.mine) - Number(a.mine) || b.ore - a.ore || b.nap - a.nap);
+    if (!holdOrder || !order.length) order = sorted.map((d) => d.id);
+    const rank = new Map(order.map((id, i) => [id, i]));
+    const rows = sorted.slice().sort((a, b) => (rank.get(a.id) ?? 1e9) - (rank.get(b.id) ?? 1e9)).slice(0, 120);
     for (const d of rows) {
       list.append(h('li', null, h('button', { type: 'button', class: 'prey' + (sel === d.id ? ' on' : ''), 'data-key': d.id, onclick: () => choose(d.id) },
         h('span', { class: 'flag', style: { background: d.mine ? '#FFE53B' : clanColor(d.clan) } }),
@@ -124,9 +146,9 @@ export function hunt(ctx: Ctx): Screen {
       h('button', { type: 'button', class: 'x', 'aria-label': 'Close', style: { position: 'absolute', right: '8px', top: '8px' }, onclick: () => choose(null) }, glyph('close', 18, '#FFF8E7')),
       h('div', { class: 'row', style: { flexWrap: 'nowrap', gap: '12px', alignItems: 'flex-start', paddingRight: '40px' } },
         h('div', { style: { background: '#2A0A26', border: '4px solid var(--paper)', flex: 'none' } }, kinIcon(1, 96, { enemy: !d.mine, crown: true, seedFrom: d.id, asleep: kingWord === 'NAP', building: kingWord === 'DOWN' ? 0.001 : null })),
-        h('div', { style: { minWidth: '0' } },
+        h('div', { style: { minWidth: '0', flex: '1', containerType: 'inline-size' } },
           h('span', { class: 'chip', style: { color: clanColor(d.clan) } }, glyph('clan', 14, clanColor(d.clan)), clanName(d.clan, clans.get(d.clan)?.meta?.name)),
-          h('h3', { style: { fontSize: d.name.length > 14 ? '18px' : d.name.length > 9 ? '22px' : '30px', color: d.mine ? 'var(--yellow)' : 'var(--paper)', marginTop: '6px', overflowWrap: 'break-word', wordBreak: 'normal' } }, d.name),
+          h('h3', { style: { fontSize: nameFit(d.name), color: d.mine ? 'var(--yellow)' : 'var(--paper)', marginTop: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, title: d.name }, d.name),
           d.mine ? h('span', { class: 'boomtxt', style: { color: 'var(--yellow)', fontSize: '22px' } }, 'YOUR DEN') : null)),
       h('dl', { class: 'facts' },
         h('div', null, h('dt', null, 'SHARD'), h('dd', { style: { color: d.ore ? 'var(--pink)' : '' } }, d.ore ? shards(d.ore) : 'NONE')),
@@ -143,10 +165,14 @@ export function hunt(ctx: Ctx): Screen {
     const me = empire.commander;
     const there = me?.fleet?.status === 'away' && me.fleet.locationId === empire.players.get(d.id)?.planetId;
     if (there) return h('a', { class: 'cbtn small pink', href: `#/prowl/${d.id}` }, glyph('pounce', 18, '#FFF8E7'), 'FIGHT');
+    // a full sky says so before the press, not after: another pack already hangs over that den
+    const full = me ? skyFull(empire.players.get(d.id)?.planet, me) : null;
+    if (full) return h('button', { type: 'button', class: 'cbtn small paper', 'aria-disabled': 'true', title: `${full} · PACK THERE`, onclick: () => toast(`${full} · WAIT`, 'warn') }, glyph('wait', 18, '#0A0612'), full);
     return h('button', { type: 'button', class: 'cbtn small pink', onclick: () => prowl(d) }, glyph('prowl', 18, '#FFF8E7'), 'PROWL');
   }
 
   function prowl(d: HuntDen) {
+    if (goTimer) return;   // one prowl per press: a second click must not land on whatever slid under it
     const me = empire.commander;
     if (!me) { if (!wallet.active?.playerId) ctx.pact(); else toast('READING', 'warn'); return; }
     if (!wallet.unlocked) { toast('PAW LOCKED', 'warn', 5000, { label: 'UNLOCK', run: () => ctx.pact() }); return; }
@@ -158,12 +184,16 @@ export function hunt(ctx: Ctx): Screen {
     if (!king.online) { toast('KING NAPS', 'enemy'); return; }
     const full = skyFull(f?.planet, me);
     if (full) { toast(full, 'enemy'); return; }
+    goTimer = -1;   // held while the chief decides
+    void leaveDen(me).then((go) => { goTimer = 0; if (go) sendProwl(d, me, planetId); });
+  }
+  function sendProwl(d: HuntDen, me: PlayerState, planetId: string) {
     try {
       act.fleetMove(me, planetId);
       audio.pop();
       scene.fx.word('PROWL!', canvas.clientWidth / 2, canvas.clientHeight / 2, '#FFE53B', 70, '#FF2E88');
       toast(`PROWL · ${d.name}`, 'player');
-      goTimer = window.setTimeout(() => ctx.go(`#/prowl/${d.id}`), 900);
+      goTimer = window.setTimeout(() => { goTimer = 0; ctx.go(`#/prowl/${d.id}`); }, 900);
     } catch (e) { toast((e as Error).message, 'enemy'); }
   }
 
@@ -175,7 +205,7 @@ export function hunt(ctx: Ctx): Screen {
   search.addEventListener('input', () => paint());
   // Enter takes the first chief the search shows
   search.addEventListener('keydown', (e) => { if (e.key !== 'Enter') return; const first = scene.dens.filter((d) => pass(d) && !d.mine).sort((a, b) => b.ore - a.ore)[0]; if (first) { e.preventDefault(); choose(first.id); } });
-  const resize = () => { scene.inset = { l: 350, r: cardEl.hidden ? 0 : 370 }; };
+  const resize = () => scene.setInset({ l: 350, r: cardEl.hidden ? 0 : 370 });
   const timer = setInterval(resize, 500);
   // idle times need the chain's height: fill them in once the heartbeat arrives
   let tookAt = 0;

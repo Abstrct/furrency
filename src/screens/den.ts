@@ -213,6 +213,8 @@ export function den(ctx: Ctx): Screen {
     const reach = [...new Set([...reachOf(t.primaryWeaponAmbits), ...reachOf(t.secondaryWeaponAmbits)])];
     const zone = totem ? 'TOTEM' : REALM_NAME[realmOf(s)];
     card.append(
+      // a way out that isn't "tap empty ground": ✕ here, and Escape (below)
+      h('button', { type: 'button', class: 'x', 'aria-label': 'Close', style: { position: 'absolute', top: '6px', right: '6px', zIndex: '2' }, onclick: () => pick(null) }, glyph('close', 18, '#FFF8E7')),
       h('div', { class: 'row', style: { flexWrap: 'nowrap', alignItems: 'flex-start', gap: '12px' } },
         h('div', { style: { background: totem ? '#3A2A10' : '#1E1240', border: '4px solid var(--paper)', flex: 'none' } }, kinIcon(s.typeId, 108, { seedFrom: s.id, crown: s.typeId === 1, asleep: s.built && !s.online, building: s.built ? null : buildProgress(s), hp: s.health / t.maxHealth })),
         h('div', { style: { minWidth: '0' } },
@@ -268,9 +270,9 @@ export function den(ctx: Ctx): Screen {
       const lost = m ? losses.list(p.playerId) : [];
       if (lost.length) {
         const last = lost[lost.length - 1];
-        const by = last.by ? (roster.get(last.by)?.name || empire.players.get(last.by)?.name || '').toUpperCase() : '';
+        const by = last.by ? ((roster.get(last.by)?.name || empire.players.get(last.by)?.name || '').toUpperCase() || `CHIEF ${last.by.split('-')[1] || last.by}`) : '';
         add(-1, 'var(--pink)', 'warn', `LOST · ${lost.map((x) => x.text).slice(-3).join(' · ')}${by ? ` · ${by}` : ''}`, ['SEEN', () => losses.seen(p.playerId)]);
-        if (last.by) add(-1, 'var(--orange)', 'pounce', `PAY BACK · ${by || 'THEM'}`, ['FIGHT', () => ctx.go(`#/prowl/${last.by}`)]);
+        if (last.by) add(-1, 'var(--orange)', 'pounce', `PAY BACK · ${by}`, ['FIGHT', () => ctx.go(`#/prowl/${last.by}`)]);
       }
       if (m && wallet.unlocked && wallet.deviceSealed && !wallet.backedUp) add(0, 'var(--pink)', 'words', 'WORDS NOT KEPT', ['KEEP', () => ctx.pact('words')]);
       const king = [...p.structs.values()].find((s) => s.typeId === 1 && !s.destroyed);
@@ -293,7 +295,7 @@ export function den(ctx: Ctx): Screen {
     if (p && mine()) {
       const has = (id: number) => [...p.structs.values()].some((x) => x.typeId === id && !x.destroyed && x.built);
       const steps: [GlyphName, string, boolean][] = [
-        ['paw', 'CHIEF', true], ['dig', 'MOLE', has(14)], ['shard', 'DIG', flag(`furrency.first.dig.${p.playerId}`) || (has(14) && p.alpha > 0n)], ['forge', 'BADGER', has(15)], ['alpha', 'ALPHA', p.alpha > 0n || flag(`furrency.first.forge.${p.playerId}`)], ['pounce', 'PROWL', p.fleet?.status === 'away' || pathDone()],
+        ['paw', 'CHIEF', true], ['call', 'MOLE', has(14)], ['dig', 'DIG', flag(`furrency.first.dig.${p.playerId}`) || (has(14) && p.alpha > 0n)], ['call', 'BADGER', has(15)], ['alpha', 'ALPHA', p.alpha > 0n || flag(`furrency.first.forge.${p.playerId}`)], ['prowl', 'PROWL', p.fleet?.status === 'away' || pathDone()],
       ];
       if (steps.some((x) => !x[2])) {
         const now = steps.findIndex((x) => !x[2]);
@@ -309,7 +311,7 @@ export function den(ctx: Ctx): Screen {
       ? h('a', { class: `cbtn ${color}`, href: run }, glyph(g, 30, color === 'pink' ? '#FFF8E7' : '#0A0612'), word, h('small', null, sub))
       : h('button', { type: 'button', class: `cbtn ${color}`, onclick: run }, glyph(g, 30, color === 'pink' ? '#FFF8E7' : '#0A0612'), word, h('small', null, sub));
     if (!p || !mine()) {
-      if (watching) dock.append(b('pounce', 'PROWL', 'THIS DEN', 'pink', `#/prowl/${p?.playerId || watching}`), b('back', 'MY DEN', 'HOME', 'yellow', '#/den'));
+      if (watching) dock.append(b('prowl', 'PROWL', 'THIS DEN', 'pink', `#/prowl/${p?.playerId || watching}`), b('back', 'MY DEN', 'HOME', 'yellow', '#/den'));
       else if (!wallet.active?.playerId) dock.append(b('paw', 'JOIN', 'START', 'pink', () => ctx.pact()), b('hunt', 'HUNT', 'LOOK', 'cyan', '#/hunt'));
       return;
     }
@@ -317,7 +319,7 @@ export function den(ctx: Ctx): Screen {
       b('call', 'CALL', 'NEW KIN', 'pink', () => callDialog(p)),
       b('glow', 'GLOW', 'POWER', 'cyan', '#/glow'),
       b('hunt', 'HUNT', 'PREY', 'yellow', '#/hunt'),
-      p.fleet?.status === 'away' ? b('home', 'HOME', 'PACK', 'orange', () => deed(p, () => act.fleetMove(p, p.planetId), false)) : b('pounce', 'PROWL', 'FIGHT', 'orange', '#/prowl'),
+      p.fleet?.status === 'away' ? b('home', 'HOME', 'PACK', 'orange', () => deed(p, () => act.fleetMove(p, p.planetId), false)) : b('prowl', 'PROWL', 'FIGHT', 'orange', '#/prowl'),
       b('roam', 'ROAM', 'NEW DEN', 'paper', () => deed(p, () => exploreConfirmed(p), false)));
   }
 
@@ -489,7 +491,10 @@ export function den(ctx: Ctx): Screen {
   // howl progress is measured in time, so it moves every block even while the engine waits to hash
   let beatAt = 0;
   const offBeat = live.onBlock(() => { const now = Date.now(); if (now - beatAt < 1000) return; beatAt = now; sceneView(player()); });
-  const offAll = [losses.onChange(paint), empire.onChange(paint), wallet.onChange(paint), pow.onChange(() => sceneView(player())), txq.onChange(() => sceneView(player())), offBeat, onLanded, offTx];
+  const onEsc = (e: KeyboardEvent) => { if (e.key === 'Escape' && sel && !document.querySelector('.veil')) { e.preventDefault(); pick(null); } };
+  document.addEventListener('keydown', onEsc);
+  const offEsc = () => document.removeEventListener('keydown', onEsc);
+  const offAll = [offEsc, losses.onChange(paint), empire.onChange(paint), wallet.onChange(paint), pow.onChange(() => sceneView(player())), txq.onChange(() => sceneView(player())), offBeat, onLanded, offTx];
   paint();
 
   return {

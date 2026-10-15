@@ -1,7 +1,7 @@
 /* A stage: one full-size canvas, sized to its box at the device's pixel ratio, drawn every frame by a
  * scene. Scenes register hit circles while they draw; the stage turns pointer events into picks,
  * hovers and drags. A shake jolts the whole frame (a pounce landing). */
-import { setBoil } from './ink';
+import { ctx2d, setBoil } from './ink';
 
 export interface Hit { id: string; x: number; y: number; r: number; cursor?: string }
 export interface Scene {
@@ -79,7 +79,7 @@ export function layer(ctx: CanvasRenderingContext2D, store: Map<string, HTMLCanv
   if (!cv || cv.dataset.key !== key) {
     cv = cv || document.createElement('canvas');
     cv.width = Math.max(1, Math.ceil(w * sc)); cv.height = Math.max(1, Math.ceil(h * sc));
-    const lc = cv.getContext('2d')!;
+    const lc = ctx2d(cv);
     lc.setTransform(sc, 0, 0, sc, 0, 0);
     paint(lc);
     cv.dataset.key = key;
@@ -92,7 +92,7 @@ export function layer(ctx: CanvasRenderingContext2D, store: Map<string, HTMLCanv
 export function mountStage(canvas: HTMLCanvasElement, scene: Scene, place = 'stage'): StageCtl {
   const quality = qualityOf(place);
   quality.sum = 0; quality.n = 0; quality.slow = 0; quality.since = 0; quality.good = 0;   // a fresh window each visit
-  const ctx = canvas.getContext('2d', { alpha: false })!;
+  const ctx = ctx2d(canvas, { alpha: false });
   let w = 0, h = 0, dpr = 1, dead = false, raf = 0, last = performance.now();
   let hits: Hit[] = [];
   let shakeAmp = 0, shakeUntil = 0;

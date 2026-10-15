@@ -14,7 +14,7 @@ export function kin(_ctx: Ctx): Screen {
     const hits = [...new Set([...reachOf(t.primaryWeaponAmbits), ...reachOf(t.secondaryWeaponAmbits)])];
     const fact = (k: string, v: string) => h('div', null, h('dt', null, k), h('dd', null, v));
     return h('article', { class: 'card', style: { '--c': totem ? 'var(--yellow)' : REALM_COLOR[zones[0] || 'root'] } },
-      h('div', { style: { background: totem ? '#3A2A10' : '#1E1240', border: '4px solid var(--ink)', display: 'grid', placeItems: 'center' } }, kinIcon(t.id, 150, { crown: t.id === 1, seedFrom: `k${t.id}` })),
+      h('div', { style: { background: totem ? '#3A2A10' : '#1E1240', border: '4px solid var(--ink)', display: 'grid', placeItems: 'center' } }, kinIcon(t.id, 150, { crown: t.id === 1, seedFrom: `k${t.id}`, wide: true })),
       h('div', { class: 'row between' }, h('h3', null, beastName(t.id)), h('span', { class: 'chip fill', style: { '--c': 'var(--pink)', color: 'var(--paper)' } }, L.role)),
       h('div', { class: 'row', style: { gap: '6px' } }, ...zones.map((r) => h('span', { class: 'chip', style: { color: '#0A0612', background: REALM_COLOR[r] } }, glyph(r, 14, '#0A0612'), REALM_NAME[r]))),
       h('dl', { class: 'facts', style: { color: 'var(--ink)' } },
@@ -31,7 +31,7 @@ export function kin(_ctx: Ctx): Screen {
     h('h1', { class: 'h1' }, 'KIN'),
     h('h2', { class: 'h2' }, glyph('pack', 34, '#22E4FF'), 'PACK'),
     h('div', { class: 'grid' }, ...pack.map(card)),
-    h('h2', { class: 'h2' }, glyph('den', 34, '#FFE53B'), 'TOTEMS'),
+    h('h2', { class: 'h2' }, glyph('totem', 34, '#FFE53B'), 'TOTEMS'),
     h('div', { class: 'grid' }, ...totems.map(card))));
   return { el, title: 'KIN', leave: () => {} };
 }

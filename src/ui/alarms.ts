@@ -4,7 +4,7 @@
  * one sign says what changed while you were away. Read from the chain's own events (the RPC feed),
  * so it works with or without GRASS. */
 import { h } from '../core/dom';
-import { toast } from '../core/dom';
+import { confirmBox, toast } from '../core/dom';
 import { live } from '../chain/live';
 import { empire, type PlayerState } from '../game/empire';
 import { wallet } from '../wallet/wallet';
@@ -16,7 +16,8 @@ import { beastName, fmtAlpha, shards } from '../lore';
 const nameOf = (pid: string) => {
   const p = empire.players.get(pid);
   const n = (p?.name && p.name !== p.playerId ? p.name : roster.get(pid)?.name) || '';
-  return n ? n.toUpperCase() : 'A CHIEF';
+  // never an anonymous "A CHIEF": the chain always says who, so name them by number when no name is known
+  return n ? n.toUpperCase() : `CHIEF ${pid.split('-')[1] || pid}`;
 };
 const detail = (data: unknown, key: string) => (data && typeof data === 'object' && key in data ? (data as Record<string, unknown>)[key] : data) as Record<string, unknown> | null;
 
@@ -74,10 +75,10 @@ export function startAlarms(go: (path: string) => void) {
           if (!mine) continue;
           const isKing = me.fleet?.commandStruct === tid;
           if (s.targetDestroyed === true || s.targetDestroyed === 'true') {
-            if (isKing) { splash('YOUR KING FELL', `BY ${nameOf(attacker)}`, 'ember'); audio.thud(); shout('kingdown', `YOUR KING FELL · ${nameOf(attacker)}`, 'enemy', { label: 'FIGHT', run: () => go(`#/prowl/${attacker}`) }, 30000); losses.add(me.playerId, 'KING FELL', attacker); }
-            else { shout(`fell:${tid}`, `YOUR ${beastName(mine.typeId)} FELL · ${nameOf(attacker)}`, 'enemy', { label: 'FIGHT', run: () => go(`#/prowl/${attacker}`) }, 20000); losses.add(me.playerId, `${beastName(mine.typeId)} FELL`, attacker); }
+            if (isKing) { splash('YOUR KING FELL', `BY ${nameOf(attacker)}`, 'ember'); audio.thud(); shout('kingdown', `YOUR KING FELL · ${nameOf(attacker)}`, 'enemy', { label: 'PAY BACK', run: () => go(`#/prowl/${attacker}`) }, 30000); losses.add(me.playerId, 'KING FELL', attacker); }
+            else { shout(`fell:${tid}`, `YOUR ${beastName(mine.typeId)} FELL · ${nameOf(attacker)}`, 'enemy', { label: 'PAY BACK', run: () => go(`#/prowl/${attacker}`) }, 20000); losses.add(me.playerId, `${beastName(mine.typeId)} FELL`, attacker); }
             fellSeen.add(tid);
-          } else shout(`hit:${attacker}`, `POUNCED · ${nameOf(attacker)}`, 'enemy', { label: 'FIGHT', run: () => go(`#/prowl/${attacker}`) }, 20000);
+          } else shout(`hit:${attacker}`, `POUNCED · ${nameOf(attacker)}`, 'enemy', { label: 'PAY BACK', run: () => go(`#/prowl/${attacker}`) }, 20000);
         }
       }
       if (e.type === 'EventOreTheft') {
@@ -87,7 +88,7 @@ export function startAlarms(go: (path: string) => void) {
           if (n > 0) {
             splash('SNATCHED!', `−${shards(n)} · ${nameOf(by)}`, 'ember');
             audio.thud();
-            shout('theft', `−${shards(n)} · ${nameOf(by)}`, 'enemy', { label: 'FIGHT', run: () => go(`#/prowl/${by}`) }, 30000);
+            shout('theft', `−${shards(n)} · ${nameOf(by)}`, 'enemy', { label: 'PAY BACK', run: () => go(`#/prowl/${by}`) }, 30000);
             losses.add(me.playerId, `−${shards(n)}`, by || null);
           }
         }
@@ -158,4 +159,11 @@ export function watchAway() {
     }
     if (Date.now() - saved > 20_000) { saved = Date.now(); try { localStorage.setItem(snapKey(p.playerId), JSON.stringify(take(p))); } catch { /* fine */ } }
   });
+}
+
+/** Before a prowl: the whole pack goes, the king with it, and shards left at home can be snatched.
+ * Asks only when there is something to lose (unforged shards); true when the chief still wants to go. */
+export async function leaveDen(p: PlayerState): Promise<boolean> {
+  if (!p.ore) return true;
+  return confirmBox('DEN LEFT OPEN', [`KING + PACK GO`, `${shards(p.ore)} AT HOME · AT RISK`, 'FORGE → SAFE'], 'PROWL', 'enemy', { stay: 'STAY', safeFirst: true });
 }

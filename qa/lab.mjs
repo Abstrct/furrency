@@ -150,7 +150,20 @@ async function act(t, a) {
     const again = fresh.d.controls.find((x) => x.text === c.text && (typeof a.click !== 'number' || Math.abs(fresh.d.controls.indexOf(x) - a.click) <= 3)) || fresh.d.controls.find((x) => x.text === c.text);
     if (!again) throw new Error(`control ${JSON.stringify(a.click)} ("${c.text}") is gone — look again`);
     c = again;
-    await p.click(c.x, c.y);
+    // like a person: bring it fully into view first (a card half under a scrolling panel's edge would
+    // otherwise be clicked through to the backdrop, which closes the dialog), then click its middle
+    const box = await p.eval(`(() => {
+      const words = (e) => (e.getAttribute('aria-label') || e.innerText || e.value || e.placeholder || e.title || '').replace(/\\s+/g, ' ').trim().slice(0, 70);
+      const all = [...document.querySelectorAll('button, a[href], input, textarea, select, [role=radio], summary')];
+      const near = (e) => { const r = e.getBoundingClientRect(); return Math.hypot(r.left + r.width / 2 - ${c.x}, r.top + r.height / 2 - ${c.y}); };
+      const e = all.filter((x) => (words(x) || '(' + x.tagName.toLowerCase() + ')') === ${JSON.stringify(c.text)}).sort((a, b) => near(a) - near(b))[0];
+      if (!e) return null;
+      e.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      const r = e.getBoundingClientRect();
+      return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
+    })()`).catch(() => null);
+    if (box) await sleep(120);
+    await p.click(box?.x ?? c.x, box?.y ?? c.y);
   } else if (a.tap != null) {
     const q = typeof a.tap === 'string' && /^c\d+$/.test(a.tap) ? Number(a.tap.slice(1)) : a.tap;
     const c = find(t.last.canvas, q);
