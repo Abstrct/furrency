@@ -122,6 +122,7 @@ export function den(ctx: Ctx): Screen {
   function workOf(s: OwnedStruct): number | null { const task = taskOf(s); return task ? howlProgress(task) : null; }
   function etaOf(s: OwnedStruct): string | null {
     const task = taskOf(s) || pow.active.find((t) => t.kind === 'build' && t.objectId === s.id);
+    if (task && !pow.settings.enabled) return 'HOWL OFF';
     const e = etaSeconds(task);
     return e == null ? null : e < 3 ? 'NOW' : `~${fmtSeconds(e)}`;
   }
@@ -278,7 +279,9 @@ export function den(ctx: Ctx): Screen {
       const king = [...p.structs.values()].find((s) => s.typeId === 1 && !s.destroyed);
       if (p.planetId && !king && m) add(0, 'var(--pink)', 'king', 'NO KING', ['CALL', () => { const t = typeOf(1); if (t) deed(p, () => act.build(p, t, 'land', 0), false); }]);
       if (p.planetId && !king && !m) add(1, 'var(--yellow)', 'king', 'KING DOWN', p.ore > 0 ? ['PROWL', () => ctx.go(`#/prowl/${p.playerId}`)] : undefined);
-      for (const r of raiders) add(0, 'var(--pink)', 'pounce', m ? 'PROWLERS!' : 'PROWLED', m ? ['DEFEND', () => ctx.go(`#/prowl/${r.owner}`)] : undefined);
+      // who is in the sky, by name: an anonymous "PROWLERS!" can't be answered
+      const who = (pid: string) => (roster.get(pid)?.name || empire.players.get(pid)?.name || '').toUpperCase() || `CHIEF ${pid.split('-')[1] || pid}`;
+      for (const r of raiders) add(0, 'var(--pink)', 'prowl', `${m ? 'PROWLERS!' : 'PROWLED'} · ${who(r.owner)}`, m ? ['DEFEND', () => ctx.go(`#/prowl/${r.owner}`)] : ['SEE', () => ctx.go(`#/prowl/${r.owner}`)]);
       if (!p.online) add(0, 'var(--orange)', 'glow', 'LOW GLOW', m ? ['GLOW', () => ctx.go('#/glow')] : undefined);
       if (p.ore > 0) {
         const forging = [...p.structs.values()].some((x) => x.typeId === 15 && !x.destroyed && x.built && x.online);
@@ -288,7 +291,7 @@ export function den(ctx: Ctx): Screen {
       if (p.fleet?.status === 'away') add(1, 'var(--cyan)', 'prowl', m ? 'PACK AWAY' : 'PACK AWAY · OPEN', m ? ['HOME', () => deed(p, () => act.fleetMove(p, p.planetId), false)] : undefined);
       const ground = num(p.planet?.gridAttributes?.ore);
       if (!p.planetId || (p.planet && ground <= 0 && p.ore === 0)) add(2, 'var(--cyan)', 'roam', p.planetId ? 'DEN EMPTY' : 'NO DEN', m ? ['ROAM', () => deed(p, () => exploreConfirmed(p), false)] : undefined);
-      else if (m && ground > 0 && !owned(p, 14)) add(2, 'var(--green)', 'dig', `${shards(ground)} IN GROUND`, ['+ DIG MOLE', () => callDialog(p, undefined, 14)]);
+      else if (m && ground > 0 && !owned(p, 14)) add(2, 'var(--green)', 'dig', `+1 A DIG · ${ground} LEFT`, ['+ DIG MOLE', () => callDialog(p, undefined, 14)]);
     }
     list.sort((a, b) => a.rank - b.rank);
     // the first steps, as a strip of signs, until they are all done
@@ -302,7 +305,7 @@ export function den(ctx: Ctx): Screen {
         omens.append(h('div', { class: 'path', 'aria-label': 'First steps' }, ...steps.map(([g, w, done], i) => h('span', { class: 'step' + (done ? ' done' : i === now ? ' now' : '') }, glyph(done ? 'done' : g, 18, done ? '#0A0612' : i === now ? '#0A0612' : '#FFF8E7'), w))));
       } else markPathDone();
     }
-    for (const o of list.slice(0, 2)) omens.append(h('div', { class: 'omen', style: { '--c': o.c } }, glyph(o.g, 24, '#0A0612'), o.text, o.act ? h('button', { type: 'button', class: 'cbtn small ink', onclick: o.act[1] }, o.act[0]) : null));
+    for (const o of list.slice(0, 2)) omens.append(h('div', { class: 'omen', style: { '--c': o.c } }, glyph(o.g, 24, '#0A0612'), h('span', null, o.text), o.act ? h('button', { type: 'button', class: 'cbtn small ink', onclick: o.act[1] }, o.act[0]) : null));
   }
 
   function paintDock(p: PlayerState | null, dock: HTMLElement = dockEl) {
@@ -484,7 +487,11 @@ export function den(ctx: Ctx): Screen {
       if (fresh) setTimeout(() => { scene.word(null, 'WELCOME!', '#FFE53B', '#FF2E88'); audio.howl(0.1); stage.shake(8); }, 900);
     }
   }
-  const resize = () => { const n = window.innerWidth < 900; scene.inset = { l: n ? 0 : 300, r: n ? 0 : 372, b: n ? 120 : 110 }; };
+  // the banners' bottom edge, so the zones start below them (a banner once covered the whole star tier)
+  const bannersBottom = () => { const r = omensEl.getBoundingClientRect(), c = canvas.getBoundingClientRect(); return r.height ? Math.max(0, r.bottom - c.top + 6) : 0; };
+  const resize = () => { const n = window.innerWidth < 900; scene.inset = { l: n ? 0 : 300, r: n ? 0 : 372, b: n ? 120 : 110, t: bannersBottom() }; };
+  const omensWatch = new ResizeObserver(() => resize());
+  omensWatch.observe(omensEl);
   resize();
   window.addEventListener('resize', resize);
   const timer = setInterval(() => sceneView(player()), 1000);
@@ -494,7 +501,7 @@ export function den(ctx: Ctx): Screen {
   const onEsc = (e: KeyboardEvent) => { if (e.key === 'Escape' && sel && !document.querySelector('.veil')) { e.preventDefault(); pick(null); } };
   document.addEventListener('keydown', onEsc);
   const offEsc = () => document.removeEventListener('keydown', onEsc);
-  const offAll = [offEsc, losses.onChange(paint), empire.onChange(paint), wallet.onChange(paint), pow.onChange(() => sceneView(player())), txq.onChange(() => sceneView(player())), offBeat, onLanded, offTx];
+  const offAll = [() => omensWatch.disconnect(), offEsc, losses.onChange(paint), empire.onChange(paint), wallet.onChange(paint), pow.onChange(() => sceneView(player())), txq.onChange(() => sceneView(player())), offBeat, onLanded, offTx];
   paint();
 
   return {

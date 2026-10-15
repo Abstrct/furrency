@@ -6,7 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { txBody, signDoc, authInfo, signTx } from '../src/wallet/tx';
 import { readFields, legacyDec } from '../src/wallet/proto';
-import { deriveKey, verifyBytes, fromB64, toHex, isAddress, normaliseMnemonic, addressOf } from '../src/wallet/keys';
+import { deriveKey, verifyBytes, fromB64, toHex, isAddress, normaliseMnemonic, addressOf, phraseProblem, newMnemonic } from '../src/wallet/keys';
 import { validateMsg } from '../src/wallet/encode';
 import { buildLoginMessage } from '../src/guild/api';
 import { ok, done } from './check';
@@ -49,4 +49,12 @@ ok(verifyBytes(k.pubKey, signDoc(f.get(1)![0] as Uint8Array, f.get(2)![0] as Uin
 ok(legacyDec('0.05') === '50000000000000000' && legacyDec('1') === '1000000000000000000', 'LegacyDec scaling');
 
 ok(buildLoginMessage('0-5', k.address, 1760000000) === `LOGIN_GUILD0-5ADDRESS${k.address}DATETIME1760000000`, 'clan sign-in message is exact');
+// recovery phrases: each failure names itself
+const good = newMnemonic(12);
+ok(phraseProblem(good) === '', 'a fresh phrase passes');
+ok(phraseProblem(good.split(' ').slice(0, 11).join(' ')) === '11 WORDS · NEED 12 OR 24', 'word count');
+ok(phraseProblem(good.replace(/^\S+/, 'furrency')) === 'WORD 1 ?', 'unknown word, by position');
+ok(phraseProblem(Array(11).fill('abandon').join(' ') + ' about') === 'PUBLIC WORDS · NOT SAFE', 'public test phrase refused');
+const w = good.split(' '); [w[0], w[1]] = [w[1], w[0]];
+ok(['TYPO · CHECK ORDER', ''].includes(phraseProblem(w.join(' '))), 'swapped words fail the checksum (or by chance still pass)');
 done('wallet');

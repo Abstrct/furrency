@@ -40,4 +40,5 @@ export function howlProgress(task: PowTask | undefined): number {
   shown.set(task.id, frac);
   return frac;
 }
-export const howlEtaWord = (task: PowTask | undefined) => { const e = howlSeconds(task); return e == null ? '' : e < 3 ? 'NOW' : `~${fmtSeconds(e)}`; };
+// with howling switched off nothing is being worked on: say so, instead of a countdown that can't finish
+export const howlEtaWord = (task: PowTask | undefined) => { if (task && !pow.settings.enabled) return 'HOWL OFF'; const e = howlSeconds(task); return e == null ? '' : e < 3 ? 'NOW' : `~${fmtSeconds(e)}`; };

@@ -19,6 +19,23 @@ export function normaliseMnemonic(m: string): string {
 }
 
 export function isValidMnemonic(m: string): boolean { return validateMnemonic(normaliseMnemonic(m), wordlist); }
+/** Phrases printed in every tutorial and test kit: whoever types one shares a key with the world. */
+const PUBLIC = new Set([
+  ['abandon', 11, 'about'], ['abandon', 23, 'art'], ['zoo', 11, 'wrong'], ['zoo', 23, 'vote'],
+].map(([w, n, last]) => `${Array(n as number).fill(w).join(' ')} ${last}`).concat(['test test test test test test test test test test test junk']));
+/** Why a typed recovery phrase can't be used, as a short sign, or '' when it can. Each failure says
+ * which: how many words, which word isn't a word, a typo that breaks the checksum, a public phrase. */
+export function phraseProblem(m: string): string {
+  const words = normaliseMnemonic(m).split(' ').filter(Boolean);
+  if (!words.length) return 'NO WORDS';
+  if (words.length !== 12 && words.length !== 24) return `${words.length} WORDS · NEED 12 OR 24`;
+  const known = new Set(wordlist);
+  const bad = words.findIndex((w) => !known.has(w));
+  if (bad >= 0) return `WORD ${bad + 1} ?`;
+  if (PUBLIC.has(words.join(' '))) return 'PUBLIC WORDS · NOT SAFE';
+  if (!validateMnemonic(words.join(' '), wordlist)) return 'TYPO · CHECK ORDER';
+  return '';
+}
 export function newMnemonic(words: 12 | 24 = 24): string { return generateMnemonic(wordlist, words === 24 ? 256 : 128); }
 
 export function addressOf(pubKey: Uint8Array, prefix = BECH32_PREFIX): string {

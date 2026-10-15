@@ -3,10 +3,11 @@
  * and forgetting it. Keys never leave this tab. */
 import { h, clear, confirmBox, toast, modal } from '../core/dom';
 import { wallet } from '../wallet/wallet';
+import { phraseProblem } from '../wallet/keys';
 import { enlist, enlisting, retryEnlist } from '../game/enlist';
 import { explore } from '../game/onboard';
 import { guilds, guildsNow, DEFAULT_GUILD, type GuildEntry } from '../guild/directory';
-import { clanColor, clanName, tag } from '../lore';
+import { clanColor, clanName, speak, tag } from '../lore';
 import { glyph } from './glyphs';
 import { empire } from '../game/empire';
 import { txq } from '../wallet/queue';
@@ -66,9 +67,14 @@ export function openPact(start?: unknown) {
   const head = (title: string, color = 'var(--pink)') => h('div', { class: 'dlg-head' },
     h('h2', { id: 'pact-title', style: { color } }, title),
     h('button', { type: 'button', class: 'x', 'aria-label': 'Close', onclick: close }, glyph('close', 20, '#FFF8E7')));
+  // a step passed is ✓ only if it was done: WORDS put off with LATER stays open (a warning, not a tick)
   const road = (at: number) => h('ol', { class: 'steps', 'aria-label': 'Steps' },
-    ...STEPS.map(([t, g], i) => h('li', { class: i < at ? 'done' : i === at ? 'now' : '', 'aria-current': i === at ? 'step' : null }, glyph(i < at ? 'done' : g, 22, '#0A0612'), t)));
-  const errLine = () => (err ? h('p', { role: 'alert', style: { margin: '10px 0 0' } }, h('span', { class: 'refusal', title: err }, tag(err))) : '');
+    ...STEPS.map(([t, g], i) => {
+      const skipped = i < at && t === 'WORDS' && !wallet.backedUp;
+      return h('li', { class: skipped ? 'skipped' : i < at ? 'done' : i === at ? 'now' : '', 'aria-current': i === at ? 'step' : null, title: skipped ? 'WORDS NOT KEPT' : undefined },
+        glyph(skipped ? 'warn' : i < at ? 'done' : g, 22, skipped ? '#FF2E88' : '#0A0612'), t);
+    }));
+  const errLine = () => (err ? h('p', { role: 'alert', style: { margin: '10px 0 0' } }, h('span', { class: 'refusal', title: err }, speak(err))) : '');
 
   async function reveal(next: Mode, passphrase?: string) {
     if (revealing) return;
@@ -266,6 +272,8 @@ export function openPact(start?: unknown) {
         h('div', { class: 'row between', style: { marginTop: '14px' } },
           h('button', { type: 'button', class: 'cbtn paper', onclick: () => { mode = 'choose'; err = ''; paint(); } }, glyph('back', 18, '#0A0612'), 'BACK'),
           h('button', { type: 'button', class: 'cbtn yellow', disabled: busy, onclick: async () => {
+            const why = phraseProblem(words.value);
+            if (why) { err = why; paint(); return; }
             busy = true; paint();
             try { await wallet.createInstant(words.value); spoken = ''; err = ''; wallet.markBackedUp(); await wallet.resolvePlayers(); toast('PAW · BACK', 'player'); mode = 'clan'; audio.howl(); }
             catch (e) { err = (e as Error).message; }

@@ -108,8 +108,11 @@ export function startAlarms(go: (path: string) => void) {
   /* firsts, from the deeds that land */
   return {
     landed(kind: 'dig' | 'forge', playerId: string) {
-      if (kind === 'dig' && once(`furrency.first.dig.${playerId}`)) splash('FIRST SHARD!', 'NOW FORGE IT', 'gold');
-      if (kind === 'forge' && once(`furrency.first.forge.${playerId}`)) splash('FIRST ALPHA!', 'SAFE FOREVER', 'gold');
+      // "first" means the chief's first, not this browser's: a chief who comes back with words already has some
+      const p = empire.players.get(playerId);
+      const veteran = !!p && (p.alpha > 0n || p.ore > 1);
+      if (kind === 'dig' && once(`furrency.first.dig.${playerId}`) && !veteran) splash('FIRST SHARD!', 'NOW FORGE IT', 'gold');
+      if (kind === 'forge' && once(`furrency.first.forge.${playerId}`) && !(p && p.alpha > 1_000_000n)) splash('FIRST ALPHA!', 'SAFE FOREVER', 'gold');
     },
   };
 }

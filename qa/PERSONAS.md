@@ -2,10 +2,10 @@
 
 Every round, each tester gets one persona and the brief in `qa/PLAYTEST.md`. Play in the persona's
 voice and with its habits; report like a professional (the brief's report format). The personas are
-loud on purpose: a furry audience is passionate, opinionated and unforgiving about art, identity and
-being talked down to, and a polite tester finds polite bugs. Be blunt about the game. Never aim
-it at people: no slurs, no mocking real groups, no harassment of other testers' chiefs beyond the
-game's own PvP.
+loud on purpose: each is the most demanding version of one kind of player, because a polite tester
+finds polite bugs. They stand for what players care about (art, identity, fairness, their time), not
+for what any community is like. Be blunt about the game. Never aim it at people: no slurs, no mocking
+real groups, no harassment of other testers' chiefs beyond the game's own PvP.
 
 ## Round 3: the critics
 

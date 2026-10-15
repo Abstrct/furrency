@@ -22,14 +22,15 @@ export interface Place { x: number; y: number; s: number; row: number; room: num
 
 /** The den's frame on a w×h canvas: the panels' insets leave [l, r]; on a phone the zones start below
  * the banners (top0) and everything stands above the dock (H). */
-export function denFrame(w: number, h: number, inset: { l: number; r: number; b: number }) {
+export function denFrame(w: number, h: number, inset: { l: number; r: number; b: number; t?: number }) {
   const narrow = w < 900;
   const l = narrow ? 0 : inset.l, r = narrow ? w : w - inset.r;
   const cx = (l + r) / 2, span = Math.max(260, r - l);
   // the den sits above the dock: zones are placed in the height the dock leaves free
   const H = narrow ? h - inset.b : h - inset.b * 0.55;
   // on a phone the banners and the deed buttons sit at the top: the zones start below them
-  const top0 = narrow ? Math.min(150, h * 0.18) : 0;
+  // …and wherever the banners reach (inset.t, measured by the den): a banner never sits on a kin
+  const top0 = Math.max(narrow ? Math.min(150, h * 0.18) : 0, Math.min(h * 0.3, inset.t ?? 0));
   const size = Math.max(54, Math.min(112, H * 0.12, span / 6.2));
   return { narrow, l, r, cx, span, H, top0, size };
 }

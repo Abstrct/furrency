@@ -147,3 +147,35 @@ Real players reach the same path in Chrome on a blocklisted GPU, in a virtual ma
 | Chrome, software GPU, after | 60 fps | 60 fps | 57 fps |
 
 During a howl the worst frame went from 600–850 ms to 17 ms. Chrome with a real GPU and Firefox are unaffected (both report real GPUs).
+
+## Round 4: verification (five critics re-ran their round-3 repros)
+
+| Tester | Fun | Clarity | Beauty | Feel | Stability | Round-3 findings (fixed · partly · still broken) |
+|---|---|---|---|---|---|---|
+| gremlin | 6 | 5 | 7 | 5 | 7 | 4 · 5 · 1 |
+| dash | 4 | 4 | 7 | 7 | 7 | 3 · 6 · 0 (1 unverified) |
+| bitey | 6 | 5 | 8 | 7 | 7 | 1 · 5 · 4 |
+| snoot | 5 | 5 | 7 | 6 | 7 | 1 · 7 · 2 |
+| tess | 6 | 4 | 7 | 6 | 7 | 1 · 5 · 4 |
+| **avg** | **5.4** | **4.6** | **7.2** | **6.2** | **7.0** | |
+
+The same five in round 3 averaged Fun 4.6, Clarity 3.4, Beauty 7.2, Feel 3.6 and Stability 4.0. The stall is confirmed gone on phone (taps 1–2.5 s while hashing; five reloads mid-howl of ~4 s each, every howl resumed).
+
+### Round 4 fixes
+
+- **POUNCE**: only one blow in flight. A press while it's on its way says POUNCING…, and presses within 400 ms are one press. Mashing had queued three blows and cost gremlin's king four fur.
+- **Names**: more look-alikes fold (2→Z, 6/9→G, VV→W, V→U), and MOD_TEAM, GAMEMASTER, FVCK and PISS are refused. bitey's exact attempts are in the tests.
+- **Recovery words** say what's wrong: `11 WORDS · NEED 12 OR 24`, `WORD 5 ?`, `TYPO · CHECK ORDER`, `PUBLIC WORDS · NOT SAFE` (the tutorial phrases anyone can type). They're tested.
+- **WORDS step**: put off with LATER, it shows a warning instead of a ✓.
+- **Howl OFF**: progress labels say HOWL OFF instead of a countdown that can't finish.
+- **Returning chiefs**: no "FIRST SHARD!" or "FIRST ALPHA!" splash for a chief who already has shards or alpha.
+- **Den banners**: the zones start below them, so a banner never covers the star tier. Banner words keep one line and the action drops below on phone. The dig banner reads `+1 A DIG · N LEFT` instead of implying 5 per dig.
+- **PROWLERS banner**: names who is in the sky (with DEFEND or SEE).
+- **SKY FULL** on the prey card reads `SKY FULL · WAIT`, with "ANOTHER PACK THERE" on press. AUTO has its own glyph (dice). Escape closes the prey card.
+
+Still open:
+- the pulse shown three ways (meter, toast and POUNCE cost);
+- about 15 newer words not yet on GLYPHS;
+- AUTO picking its own target (by design: it picks the wisest safe blow);
+- den and HOWL panel estimates disagreeing;
+- the chain-side items: no new-player ward, public idle data, raiding an empty den, and no healing in Structs.

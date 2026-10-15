@@ -201,6 +201,8 @@ body[data-route="gate"] .top, body[data-route="gate"] .rail { display: none; }
 .path .step.now { background: var(--yellow); color: var(--ink); opacity: 1; animation: nudge 2s ease-in-out infinite; }
 .omen { display: flex; align-items: center; gap: 10px; padding: 5px 6px 5px 12px; background: var(--c, var(--yellow)); color: var(--ink); border: 4px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); font: 22px var(--boom); letter-spacing: .05em; }
 .omen .cbtn { min-height: 36px; font-size: 18px; padding: 2px 10px; border-width: 3px; box-shadow: 2px 2px 0 var(--ink); }
+/* the words keep one line; when the action can't fit beside them it drops below instead of squeezing them */
+.omen { flex-wrap: wrap; justify-content: center; row-gap: 6px; } .omen > span { white-space: nowrap; } .omen .cbtn { flex: none; }
 .big-face { display: block; }
 .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 10px 0; }
 .facts div { border: 3px solid currentColor; padding: 4px 8px; }

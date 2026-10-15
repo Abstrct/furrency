@@ -35,7 +35,7 @@ export class DenScene implements Scene {
   selected: string | null = null;
   hovered: string | null = null;
   /** Where the left and right panels cover the canvas (px), so the den centres between them. */
-  inset = { l: 300, r: 370, b: 110 };
+  inset: { l: number; r: number; b: number; t?: number } = { l: 300, r: 370, b: 110 };
   onPick: (id: string | null) => void = () => {};
   onSlot: (s: FreeSlot) => void = () => {};
   private pos = new Map<string, { x: number; y: number; s: number }>();

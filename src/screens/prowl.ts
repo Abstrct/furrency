@@ -185,9 +185,16 @@ export function prowl(ctx: Ctx): Screen {
       prowlOut(); return;
     }
     const job = pendingStrike();
+    // a second press while the first blow waits takes it back; while it is already on its way, presses do
+    // nothing (mashing once queued three blows and cost a king four fur)
+    const now = Date.now();
+    if (now - lastPress < 400) return;
+    lastPress = now;
     if (job && ['queued', 'waiting'].includes(job.status)) { txq.cancel(job.id); if (fightOn) { fightOn = false; fightNote = 'STOP'; } paint(); return; }
+    if (job || unheard) { toast('POUNCING…', 'warn', 1500); return; }
     pounce();
   }
+  let lastPress = 0;
 
   /* ── fight on: the wisest safe blow each time pulse fills ── */
   function fightTick() {
@@ -354,7 +361,7 @@ export function prowl(ctx: Ctx): Screen {
       glyph(word.startsWith('PROWL') ? 'prowl' : word.startsWith('SKY') || word === 'WAIT' ? 'wait' : word.startsWith('GUARD') ? 'guard' : word.startsWith('LEAP') ? 'leap' : 'pounce', 36, color === 'pink' ? '#FFF8E7' : '#0A0612'),
       h('span', null, word), sub ? h('span', { class: 'cost' }, sub) : null);
     const row = h('div', { class: 'row center' }, btn);
-    if (inFight()) row.append(h('button', { type: 'button', class: `cbtn ${fightOn ? 'green' : 'ink'}`, 'aria-pressed': String(fightOn), onclick: () => { fightOn = !fightOn; fightNote = ''; if (fightOn) chose = false; paint(); } }, glyph(fightOn ? 'howl' : 'pounce', 22, fightOn ? '#0A0612' : '#FFF8E7'), fightOn ? 'AUTO ON' : 'AUTO'));
+    if (inFight()) row.append(h('button', { type: 'button', class: `cbtn ${fightOn ? 'green' : 'ink'}`, 'aria-pressed': String(fightOn), onclick: () => { fightOn = !fightOn; fightNote = ''; if (fightOn) chose = false; paint(); } }, glyph('dice', 22, fightOn ? '#0A0612' : '#FFF8E7'), fightOn ? 'AUTO ON' : 'AUTO'));
     strike.append(row);
     if (note) strike.append(h('span', { class: 'refusal', title: note }, tag(note) === 'NOPE' && /^[A-Z ·]+$/.test(note) ? note : tag(note)));
     if (fightNote) strike.append(h('span', { class: 'chip', style: { background: 'var(--ink)', color: 'var(--yellow)' } }, fightNote));

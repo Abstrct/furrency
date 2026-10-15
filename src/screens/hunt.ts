@@ -167,7 +167,7 @@ export function hunt(ctx: Ctx): Screen {
     if (there) return h('a', { class: 'cbtn small pink', href: `#/prowl/${d.id}` }, glyph('pounce', 18, '#FFF8E7'), 'FIGHT');
     // a full sky says so before the press, not after: another pack already hangs over that den
     const full = me ? skyFull(empire.players.get(d.id)?.planet, me) : null;
-    if (full) return h('button', { type: 'button', class: 'cbtn small paper', 'aria-disabled': 'true', title: `${full} · PACK THERE`, onclick: () => toast(`${full} · WAIT`, 'warn') }, glyph('wait', 18, '#0A0612'), full);
+    if (full) return h('button', { type: 'button', class: 'cbtn small paper', 'aria-disabled': 'true', title: `${full} · ANOTHER PACK THERE`, onclick: () => toast(`${full} · ANOTHER PACK THERE · WAIT`, 'warn') }, glyph('wait', 18, '#0A0612'), `${full} · WAIT`);
     return h('button', { type: 'button', class: 'cbtn small pink', onclick: () => prowl(d) }, glyph('prowl', 18, '#FFF8E7'), 'PROWL');
   }
 
@@ -210,7 +210,9 @@ export function hunt(ctx: Ctx): Screen {
   // idle times need the chain's height: fill them in once the heartbeat arrives
   let tookAt = 0;
   const offBeat = live.onBlock(() => { if (roster.roster && (!tookAt || Date.now() - tookAt > 60_000)) { tookAt = Date.now(); take(roster.roster); } });
-  const offs = [offBeat, roster.onChange(take), empire.onChange(() => { if (sel) stable(cardEl, (b) => paintCard(b)); }), wallet.onChange(paint)];
+  const onEsc = (e: KeyboardEvent) => { if (e.key === 'Escape' && sel && !document.querySelector('.veil')) { e.preventDefault(); choose(null); } };
+  document.addEventListener('keydown', onEsc);
+  const offs = [() => document.removeEventListener('keydown', onEsc), offBeat, roster.onChange(take), empire.onChange(() => { if (sel) stable(cardEl, (b) => paintCard(b)); }), wallet.onChange(paint)];
   paint();
   void load();
 
