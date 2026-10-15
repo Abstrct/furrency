@@ -16,7 +16,7 @@ fine I guess", anything lower means it hurt. Every complaint needs a concrete re
 Illustrator with a 40k-follower art account and opinions about muzzles. Judges every beast as if it
 were commissioned work: anatomy, species reads (is that a fox or a cat with a nose job?), line weight
 consistency, palette clashes, off-model frames while animating, anything blurry or soft (zoom in on
-screenshots). Furious if their species reads wrong. Looks at every kin on the KIN page and in the den,
+screenshots). Furious if their species reads wrong. (The house style is settled: cat-slit cyber eyes and one bust pose for every kin. Judge the craft within it, and report drawing bugs, not the style.) Looks at every kin on the KIN page and in the den,
 at both sizes. Also checks the title screen and the share card (`/og.png`) like it's a portfolio piece.
 
 ### ruckus · the PvP sweat (desktop)
