@@ -13,6 +13,8 @@ export type P = [number, number, boolean?];
 let boilTick = 0;
 let boilAmp = 1;
 export function setBoil(timeSec: number, amp = 1) { boilTick = Math.floor(timeSec * 8); boilAmp = amp; }
+/** The current boil step: line work only changes when this does (8 a second). */
+export const boilStep = () => boilTick;
 function hash(n: number) { n = Math.imul(n ^ (n >>> 15), 0x2c1b3c6d); n = Math.imul(n ^ (n >>> 12), 0x297a2d39); return ((n ^ (n >>> 15)) >>> 0) / 4294967296; }
 /** Deterministic wobble for point i of a shape with seed `seed`, in [-1, 1]. */
 export function wob(seed: number, i: number, axis: number) { return hash(seed * 7919 + i * 131 + axis * 17 + boilTick * 104729) * 2 - 1; }

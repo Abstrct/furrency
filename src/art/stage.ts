@@ -15,7 +15,83 @@ export interface StageCtl { dispose(): void; shake(amount: number, ms?: number):
 
 const reduced = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export function mountStage(canvas: HTMLCanvasElement, scene: Scene): StageCtl {
+/* ── Quality: how many canvas pixels per screen pixel ────────────────────────────────────────────
+ * Painting cost grows with pixels, and a retina canvas has four times as many: on a machine (or a
+ * browser: Firefox paints this game's canvases far slower than Chrome) that is the difference between
+ * 50 and 12 frames a second. Each place has its own governor, since the title is far heavier than the
+ * hunt map: when its frames come too slowly it steps the resolution down; given steady headroom it
+ * steps back up, never to a step that already proved too slow there. Steps are remembered per device. */
+const STEPS = [2, 1.75, 1.5, 1.25, 1, 0.85, 0.7];
+const QKEY = 'furrency.stage.scale.v2';
+const deviceMax = () => Math.min(2, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1);
+// localStorage 'furrency.stage.pin' = '2' (or 1, 1.5…) holds every place there with no governor: for testing
+const PIN = (() => { try { const v = Number(localStorage.getItem('furrency.stage.pin')); return v > 0 ? v : 0; } catch { return 0; } })();
+const saved: Record<string, number> = (() => { try { return JSON.parse(localStorage.getItem(QKEY) || '{}') || {}; } catch { return {}; } })();
+
+interface Quality { scale: number; tooSlow: number; sum: number; n: number; slow: number; since: number; good: number; listeners: Set<() => void> }
+const places = new Map<string, Quality>();
+function qualityOf(place: string): Quality {
+  let q = places.get(place);
+  if (!q) {
+    const v = Number(saved[place]);
+    q = { scale: PIN || (v > 0 ? Math.min(v, deviceMax()) : deviceMax()), tooSlow: Infinity, sum: 0, n: 0, slow: 0, since: 0, good: 0, listeners: new Set() };
+    places.set(place, q);
+  }
+  return q;
+}
+/** Feed one frame interval (seconds); steps the place's resolution when the trend is clear. */
+function govern(place: string, q: Quality, dt: number, now: number) {
+  if (PIN || dt <= 0 || dt > 0.25) return;      // pinned, or a hidden tab or a stall, not a trend
+  q.sum += dt; q.n++;
+  if (dt > 0.024) q.slow++;               // a dropped frame at 60 Hz
+  if (!q.since) q.since = now;
+  if (now - q.since < 1000) return;
+  const avg = q.sum / q.n, dropped = q.slow / q.n;
+  q.sum = 0; q.n = 0; q.slow = 0; q.since = now;
+  const i = STEPS.findIndex((x) => x <= q.scale + 1e-6);
+  let next = q.scale;
+  // under ~40 fps, or uneven: more than one frame in eight dropped reads as sluggish even at a fair average
+  if (avg > 1 / 40 || dropped > 0.125) {
+    q.good = 0;
+    q.tooSlow = Math.min(q.tooSlow, q.scale);
+    if (i >= 0 && i < STEPS.length - 1) next = STEPS[i + 1];
+  } else if (avg < 1 / 55 && dropped < 0.03 && ++q.good >= 5) {   // five steady seconds: try one step up
+    q.good = 0;
+    const up = i > 0 ? STEPS[i - 1] : q.scale;
+    if (up <= deviceMax() && up < q.tooSlow) next = up;
+  }
+  if (next !== q.scale) {
+    q.scale = next;
+    saved[place] = next;
+    try { localStorage.setItem(QKEY, JSON.stringify(saved)); } catch { /* private mode: this visit only */ }
+    for (const f of q.listeners) f();
+  }
+}
+
+/** A still layer, painted once and copied in every frame: repainted only when its size, the canvas
+ * resolution or `version` changes. `paint` draws in the stage's own units (w × h). Full-screen
+ * gradients, dot screens and big outlined letters are slow to paint on software canvases and never
+ * change between frames, so a scene keeps them here. */
+export function layer(ctx: CanvasRenderingContext2D, store: Map<string, HTMLCanvasElement>, name: string, w: number, h: number, paint: (c: CanvasRenderingContext2D) => void, version = '') {
+  const m = ctx.getTransform(), sc = Math.hypot(m.a, m.b) || 1;
+  const key = `${Math.round(w)}x${Math.round(h)}@${sc.toFixed(3)}|${version}`;
+  let cv = store.get(name);
+  if (!cv || cv.dataset.key !== key) {
+    cv = cv || document.createElement('canvas');
+    cv.width = Math.max(1, Math.ceil(w * sc)); cv.height = Math.max(1, Math.ceil(h * sc));
+    const lc = cv.getContext('2d')!;
+    lc.setTransform(sc, 0, 0, sc, 0, 0);
+    paint(lc);
+    cv.dataset.key = key;
+    store.set(name, cv);
+  }
+  ctx.drawImage(cv, 0, 0, w, h);
+}
+
+/** `place` names the screen, for its own resolution governor. */
+export function mountStage(canvas: HTMLCanvasElement, scene: Scene, place = 'stage'): StageCtl {
+  const quality = qualityOf(place);
+  quality.sum = 0; quality.n = 0; quality.slow = 0; quality.since = 0; quality.good = 0;   // a fresh window each visit
   const ctx = canvas.getContext('2d', { alpha: false })!;
   let w = 0, h = 0, dpr = 1, dead = false, raf = 0, last = performance.now();
   let hits: Hit[] = [];
@@ -24,19 +100,30 @@ export function mountStage(canvas: HTMLCanvasElement, scene: Scene): StageCtl {
 
   const fit = () => {
     const r = canvas.getBoundingClientRect();
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = PIN || Math.min(quality.scale, deviceMax());
     w = Math.max(1, Math.round(r.width)); h = Math.max(1, Math.round(r.height));
-    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    const cw = Math.round(w * dpr), ch = Math.round(h * dpr);
+    // resizing a canvas clears it: only when the size really changed
+    if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
   };
   const ro = new ResizeObserver(fit);
   ro.observe(canvas);
+  quality.listeners.add(fit);
   fit();
 
+  let covered = false;
   const frame = (now: number) => {
     if (dead) return;
     raf = requestAnimationFrame(frame);
-    const dt = Math.min(0.1, (now - last) / 1000);
+    // a dialog over the stage hides most of it: a few frames a second is plenty, and those slow
+    // frames are chosen, so they tell the governor nothing about the machine
+    const wasCovered = covered;
+    covered = !!document.querySelector('.veil');
+    if (covered && now - last < 100) return;
+    const gap = (now - last) / 1000;
+    const dt = Math.min(0.1, gap);
     last = now;
+    if (!covered && !wasCovered) govern(place, quality, gap, now);
     const t = now / 1000;
     setBoil(t, reduced ? 0 : 1);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -100,7 +187,7 @@ export function mountStage(canvas: HTMLCanvasElement, scene: Scene): StageCtl {
     size: () => ({ w, h }),
     shake(amount: number, ms = 400) { shakeAmp = Math.max(shakeAmp * (shakeUntil > performance.now() ? 1 : 0), amount); shakeUntil = performance.now() + ms; },
     dispose() {
-      dead = true; cancelAnimationFrame(raf); ro.disconnect();
+      dead = true; cancelAnimationFrame(raf); ro.disconnect(); quality.listeners.delete(fit);
       canvas.removeEventListener('pointerdown', onDown); canvas.removeEventListener('pointermove', onMove);
       canvas.removeEventListener('pointerup', onUp); canvas.removeEventListener('pointerleave', onLeave); canvas.removeEventListener('wheel', onWheel);
     },

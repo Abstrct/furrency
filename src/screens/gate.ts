@@ -1,9 +1,9 @@
 /* The Gate: the title. A Sun Lion roars in the middle of a speed-line burst while kin orbit and
  * alpha coins rain; every deed anyone does on the network right now pops up as a comic word, and
  * the ticker names it. */
-import { h, clear } from '../core/dom';
+import { h, clear, stable } from '../core/dom';
 import type { Ctx, Screen } from './types';
-import { mountStage, type Scene } from '../art/stage';
+import { layer, mountStage, type Scene } from '../art/stage';
 import { Fx } from '../art/fx';
 import { INK, burst, halftone, letter, speedLines, FONT_TITLE, FONT_BOOM } from '../art/ink';
 import { drawKin } from '../art/totem';
@@ -42,13 +42,17 @@ export function gate(ctx: Ctx): Screen {
 
   const fx = new Fx();
   let roar = 0;
+  const layers = new Map<string, HTMLCanvasElement>();
   const scene: Scene = {
     draw(c, w, h2, t, dt) {
-      const g = c.createRadialGradient(w * 0.66, h2 * 0.55, 10, w * 0.66, h2 * 0.55, Math.max(w, h2) * 0.8);
-      g.addColorStop(0, '#FF2E88'); g.addColorStop(0.35, '#7A3CFF'); g.addColorStop(1, '#140C2B');
-      c.fillStyle = g; c.fillRect(0, 0, w, h2);
-      const pat = halftone(c, INK, 11, 2.2, 0.28);
-      if (pat) { c.fillStyle = pat; c.fillRect(0, 0, w, h2); }
+      // the sky: a gradient and a dot screen, the same every frame
+      layer(c, layers, 'sky', w, h2, (l) => {
+        const g = l.createRadialGradient(w * 0.66, h2 * 0.55, 10, w * 0.66, h2 * 0.55, Math.max(w, h2) * 0.8);
+        g.addColorStop(0, '#FF2E88'); g.addColorStop(0.35, '#7A3CFF'); g.addColorStop(1, '#140C2B');
+        l.fillStyle = g; l.fillRect(0, 0, w, h2);
+        const pat = halftone(l, INK, 11, 2.2, 0.28);
+        if (pat) { l.fillStyle = pat; l.fillRect(0, 0, w, h2); }
+      });
       const cx = w > 900 ? w * 0.69 : w * 0.5, cy = h2 * (w > 900 ? 0.6 : 0.56);
       const R = Math.min(w, h2) * 0.5;
       c.save(); c.translate(cx, cy); c.rotate(t * 0.04); c.translate(-cx, -cy);
@@ -79,37 +83,39 @@ export function gate(ctx: Ctx): Screen {
         c.fillStyle = INK; c.font = `16px ${FONT_TITLE}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('α', 0, 1);
         c.restore();
       }
-      // the title
-      const ts = Math.min(w * (w > 900 ? 0.11 : 0.17), 168);
-      c.save();
-      c.translate(w > 900 ? w * 0.05 : w * 0.06, h2 * (w > 900 ? 0.2 : 0.16));
-      c.rotate(-0.06);
-      letter(c, 'FUR', 0, 0, ts, '#FFE53B', { font: FONT_TITLE, align: 'left', shadow: '#FF2E88', outline: ts * 0.05 });
-      letter(c, 'RENCY', 0, ts * 0.92, ts, '#FFE53B', { font: FONT_TITLE, align: 'left', shadow: '#FF2E88', outline: ts * 0.05 });
-      c.restore();
-      const words: [string, string][] = [['DIG', '#22E4FF'], ['FORGE', '#FF7A1A'], ['POUNCE', '#FF2E88'], ['HOWL', '#FFF8E7']];
-      let x = w > 900 ? w * 0.055 : w * 0.06;
-      const wy = h2 * (w > 900 ? 0.2 : 0.16) + ts * 1.75;
-      c.font = `${Math.min(40, ts * 0.27)}px ${FONT_BOOM}`;
-      for (const [word, col] of words) {
-        const ww = c.measureText(word).width + 26, hh = Math.min(52, ts * 0.36);
-        c.save(); c.translate(x, wy); c.rotate(-0.06);
-        c.fillStyle = INK; c.fillRect(5, 5, ww, hh);
-        c.fillStyle = col; c.fillRect(0, 0, ww, hh); c.strokeStyle = INK; c.lineWidth = 4; c.strokeRect(0, 0, ww, hh);
-        c.fillStyle = INK; c.textBaseline = 'middle'; c.textAlign = 'center'; c.fillText(word, ww / 2, hh / 2 + 2);
-        c.restore();
-        x += ww + 12;
-      }
-      c.save();
-      c.translate(w > 900 ? w * 0.055 : w * 0.06, wy + Math.min(52, ts * 0.36) + Math.min(46, ts * 0.32));
-      c.rotate(-0.06);
-      letter(c, 'BE THE ALPHA', 0, 0, Math.min(44, ts * 0.3), '#FFF8E7', { font: FONT_TITLE, align: 'left', shadow: '#0A0612', outline: 3 });
-      c.restore();
+      // the title, the four words and the tagline: still, so painted once per size (fonts may land late)
+      layer(c, layers, 'title', w, h2, (l) => {
+        const ts = Math.min(w * (w > 900 ? 0.11 : 0.17), 168);
+        l.save();
+        l.translate(w > 900 ? w * 0.05 : w * 0.06, h2 * (w > 900 ? 0.2 : 0.16));
+        l.rotate(-0.06);
+        letter(l, 'FUR', 0, 0, ts, '#FFE53B', { font: FONT_TITLE, align: 'left', shadow: '#FF2E88', outline: ts * 0.05 });
+        letter(l, 'RENCY', 0, ts * 0.92, ts, '#FFE53B', { font: FONT_TITLE, align: 'left', shadow: '#FF2E88', outline: ts * 0.05 });
+        l.restore();
+        const words: [string, string][] = [['DIG', '#22E4FF'], ['FORGE', '#FF7A1A'], ['POUNCE', '#FF2E88'], ['HOWL', '#FFF8E7']];
+        let x = w > 900 ? w * 0.055 : w * 0.06;
+        const wy = h2 * (w > 900 ? 0.2 : 0.16) + ts * 1.75;
+        l.font = `${Math.min(40, ts * 0.27)}px ${FONT_BOOM}`;
+        for (const [word, col] of words) {
+          const ww = l.measureText(word).width + 26, hh = Math.min(52, ts * 0.36);
+          l.save(); l.translate(x, wy); l.rotate(-0.06);
+          l.fillStyle = INK; l.fillRect(5, 5, ww, hh);
+          l.fillStyle = col; l.fillRect(0, 0, ww, hh); l.strokeStyle = INK; l.lineWidth = 4; l.strokeRect(0, 0, ww, hh);
+          l.fillStyle = INK; l.textBaseline = 'middle'; l.textAlign = 'center'; l.fillText(word, ww / 2, hh / 2 + 2);
+          l.restore();
+          x += ww + 12;
+        }
+        l.save();
+        l.translate(w > 900 ? w * 0.055 : w * 0.06, wy + Math.min(52, ts * 0.36) + Math.min(46, ts * 0.32));
+        l.rotate(-0.06);
+        letter(l, 'BE THE ALPHA', 0, 0, Math.min(44, ts * 0.3), '#FFF8E7', { font: FONT_TITLE, align: 'left', shadow: '#0A0612', outline: 3 });
+        l.restore();
+      }, document.fonts?.status || '');
       fx.draw(c, dt);
     },
     pick() { roar = 1; fx.word('ROAR!', canvas.clientWidth * 0.66, canvas.clientHeight * 0.3, '#FFE53B', 70, '#FF2E88'); audio.howl(0.12); },
   };
-  const stage = mountStage(canvas, scene);
+  const stage = mountStage(canvas, scene, 'gate');
 
   function paintUi() {
     clear(ui);
@@ -127,8 +133,8 @@ export function gate(ctx: Ctx): Screen {
 
   let chiefs: Warden[] = [];
   const names = new Map<string, string>();
-  function paintStats() {
-    clear(stats);
+  function paintStats() { stable(stats, fillStats); }
+  function fillStats(stats: HTMLElement) {
     const card = (g: GlyphName, v: string, word: string, c: string) => h('div', { class: 'card', style: { '--c': c } }, h('div', { class: 'row', style: { gap: '6px' } }, glyph(g, 22, '#0A0612'), h('small', null, word)), h('b', null, v));
     const nChiefs = roster.roster?.chiefs.length || chiefs.length;
     stats.append(card('paw', nChiefs ? (nChiefs >= 400 && !roster.roster ? '400+' : nChiefs.toLocaleString('en-US')) : '…', 'CHIEFS', 'var(--yellow)'),

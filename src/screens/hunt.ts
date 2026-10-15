@@ -33,7 +33,7 @@ export function hunt(ctx: Ctx): Screen {
   const el = h('div', { class: 'screen' }, canvas, left, cardEl);
 
   const scene = new HuntScene();
-  const stage = mountStage(canvas, scene);
+  const stage = mountStage(canvas, scene, 'hunt');
   scene.onPick = (id) => choose(id);
 
   let clans = new Map<string, GuildEntry>();
@@ -83,14 +83,14 @@ export function hunt(ctx: Ctx): Screen {
     paint();
   }
 
-  function paintSeg() {
-    clear(seg);
+  function paintSeg() { stable(seg, fillSeg); }
+  function fillSeg(seg: HTMLElement) {
     for (const [k, word, g] of [['all', 'ALL', 'paw'], ['rich', 'SHARD', 'shard'], ['nap', 'IDLE', 'wait']] as [Filter, string, GlyphName][])
       seg.append(h('button', { type: 'button', class: filter === k ? 'on' : '', 'aria-pressed': String(filter === k), onclick: () => { filter = k; paint(); } }, glyph(g, 16, filter === k ? '#FFE53B' : '#0A0612'), ' ', word));
   }
 
-  function paintList() {
-    clear(list);
+  function paintList() { stable(list, fillList); }
+  function fillList(list: HTMLElement) {
     if (!loaded) { list.append(h('li', { class: 'boomtxt', style: { fontSize: '22px' } }, 'SNIFFING…')); return; }
     if (failed && !scene.dens.length) { list.append(h('li', null, h('span', { class: 'refusal' }, 'NET DOWN'))); return; }
     const rows = scene.dens.filter((d) => pass(d)).sort((a, b) => Number(b.mine) - Number(a.mine) || b.ore - a.ore || b.nap - a.nap).slice(0, 120);

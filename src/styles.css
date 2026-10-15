@@ -136,7 +136,7 @@ body[data-route="gate"] .top, body[data-route="gate"] .rail { display: none; }
 .dark .bar { border-color: var(--paper); background: var(--ink); }
 
 /* ── Veil and dialogs ────────────────────────────────── */
-.veil { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(10, 6, 18, .72); backdrop-filter: blur(3px); animation: fade .18s; overflow-y: auto; }
+.veil { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(10, 6, 18, .8); animation: fade .18s; overflow-y: auto; }
 @keyframes fade { from { opacity: 0; } }
 .veil > .panel { width: min(560px, 100%); animation: popin .28s cubic-bezier(.3, 1.6, .5, 1); max-height: calc(100vh - 32px); overflow-y: auto; }
 .veil > .panel.wide { width: min(980px, 100%); }

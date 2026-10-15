@@ -31,7 +31,7 @@ export function prowl(ctx: Ctx): Screen {
   const el = h('div', { class: 'screen' }, canvas, warbarEl, strikeEl, fray);
 
   const scene = new ProwlScene();
-  const stage = mountStage(canvas, scene);
+  const stage = mountStage(canvas, scene, 'prowl');
   scene.onPick = (id, side) => { if (side === 'ours') chooseStriker(id); else chooseMark(id); audio.click(); };
 
   let targetPid: string | null = ctx.param || null;
@@ -352,8 +352,8 @@ export function prowl(ctx: Ctx): Screen {
     if (fightNote) strike.append(h('span', { class: 'chip', style: { background: 'var(--ink)', color: 'var(--yellow)' } }, fightNote));
   }
 
-  function paintFray() {
-    clear(frayList);
+  function paintFray() { stable(frayList, fillFray); }
+  function fillFray(frayList: HTMLElement) {
     fray.hidden = !told.length;
     for (const t of told.slice(0, 4)) {
       const { head, bits } = tellBlow(t.blow, who);

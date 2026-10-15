@@ -5,8 +5,51 @@ import { INK, PAPER, ell, mirror, mix, paint, shape, spikes, stroke, wob, zig, t
 import { drawBeast, type Pose } from './beast';
 import { lore } from '../lore';
 
+/* ── Sprites: a kin is painted once per boil step and copied in between ────────────────────────
+ * A beast is hundreds of inked paths, cel-shading clips and halftone fills. Its line work only
+ * changes 8 times a second (the boil), so it is painted into its own small canvas once per step,
+ * its motion stepped with it ("on threes", like the ink), and every frame between is one copy.
+ * Software canvases (Firefox on many machines, weaker laptops) paint ~8x less per frame this way.
+ * Brief effects (a hit flash, a lunge) and a caller's shadow paint directly, as before. */
+const PAD = { l: 1.3, r: 1.3, t: 1.8, b: 0.25 };     // measured reach: ±1.16 wide, 1.61 up, 0.08 down
+interface Sprite { c: HTMLCanvasElement; step: number; used: number; phase: number }
+const sprites = new Map<string, Sprite>();
+let sweptAt = 0;
+
 /** Draw any kin: beasts and totems alike. */
 export function drawKin(ctx: CanvasRenderingContext2D, typeId: number, x: number, y: number, size: number, pose: Pose) {
+  if ((pose.flash ?? 0) > 0 || pose.lunge || ctx.shadowBlur || ctx.shadowOffsetX || ctx.shadowOffsetY || typeof document === 'undefined') return drawKinNow(ctx, typeId, x, y, size, pose);
+  const m = ctx.getTransform(), sc = Math.hypot(m.a, m.b) || 1;
+  const px = size * sc;
+  if (px < 14 || px > 900) return drawKinNow(ctx, typeId, x, y, size, pose);
+  // resolution in ~9% steps, so a beast that grows or shrinks reuses its canvas until it really changes
+  const res = Math.pow(2, Math.round(Math.log2(px) * 8) / 8);
+  const key = `${typeId}|${pose.seed}|${res}|${pose.asleep ? 1 : 0}${pose.hidden ? 1 : 0}${pose.enemy ? 1 : 0}${pose.crown ? 1 : 0}${pose.still ? 1 : 0}|${pose.hp == null ? '' : Math.round(pose.hp * 20)}|${pose.building == null ? '' : Math.round(pose.building * 100)}`;
+  const now = performance.now();
+  let sp = sprites.get(key);
+  if (!sp) {
+    // each sprite refreshes at its own moment within the step, so a crowd doesn't repaint all in one frame
+    let hsh = 0; for (let i = 0; i < key.length; i++) hsh = (hsh * 31 + key.charCodeAt(i)) >>> 0;
+    sp = { c: document.createElement('canvas'), step: NaN, used: now, phase: (hsh % 997) / 997 };
+    sp.c.width = Math.ceil((PAD.l + PAD.r) * res); sp.c.height = Math.ceil((PAD.t + PAD.b) * res);
+    sprites.set(key, sp);
+  }
+  sp.used = now;
+  const step = Math.floor(pose.t * 8 + sp.phase);
+  if (sp.step !== step) {
+    sp.step = step;
+    const sctx = sp.c.getContext('2d')!;
+    const ref = res / sc;   // drawn at the caller's own scale, so line-width floors land exactly as before
+    sctx.setTransform(1, 0, 0, 1, 0, 0); sctx.clearRect(0, 0, sp.c.width, sp.c.height);
+    sctx.setTransform(sc, 0, 0, sc, 0, 0);
+    drawKinNow(sctx, typeId, PAD.l * ref, PAD.t * ref, ref, pose.still ? pose : { ...pose, t: step / 8 });
+  }
+  ctx.drawImage(sp.c, x - PAD.l * size, y - PAD.t * size, (PAD.l + PAD.r) * size, (PAD.t + PAD.b) * size);
+  if (now - sweptAt > 2000) { sweptAt = now; for (const [k, v] of sprites) if (now - v.used > 3000) sprites.delete(k); }
+}
+
+/** Paint a kin straight onto `ctx`, every path (portraits and one-offs; drawKin caches this). */
+export function drawKinNow(ctx: CanvasRenderingContext2D, typeId: number, x: number, y: number, size: number, pose: Pose) {
   const look = lore(typeId).look;
   if (!look.totem) return drawBeast(ctx, typeId, x, y, size, pose);
   if (look.totem === 'mole' || look.totem === 'badger') {

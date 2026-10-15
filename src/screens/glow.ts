@@ -1,7 +1,7 @@
 /* Glow: where alpha becomes power. Every clan keeps a sun (the chain's reactors); feed alpha to one
  * and your den's glow rises, pull it back and it falls. Your link (substation) and your glow meter
  * are read live. FEED and PULL sign MsgReactorInfuse / MsgReactorDefuse. */
-import { h, clear, toast, confirmBox, keepFocus, modal } from '../core/dom';
+import { h, toast, confirmBox, keepFocus, modal, stable } from '../core/dom';
 import type { Ctx, Screen } from './types';
 import { mountStage, type Scene } from '../art/stage';
 import { INK, burst, halftone, letter, speedLines, FONT_TITLE } from '../art/ink';
@@ -59,7 +59,7 @@ export function glow(ctx: Ctx): Screen {
     },
     pick(_hit, x, y) { fx.word('GLOW!', x, y, '#0A0612', 50, '#22E4FF'); audio.zap(); },
   };
-  const stage = mountStage(canvas, scene);
+  const stage = mountStage(canvas, scene, 'glow');
 
   let list: Sun[] = [];
   let feeds: RawInfusion[] = [];
@@ -135,8 +135,8 @@ export function glow(ctx: Ctx): Screen {
   const card = (c: string, g: Parameters<typeof glyph>[0], word: string, big2: string, rows: (Node | string | null)[]) =>
     h('section', { class: 'card', style: { '--c': c } }, h('div', { class: 'row', style: { gap: '8px' } }, glyph(g, 26, '#0A0612'), h('span', { class: 'tag' }, word)), h('div', { class: 'big-num' }, big2), ...rows);
 
-  function paintMine() {
-    clear(mine);
+  function paintMine() { stable(mine, fillMine); }
+  function fillMine(mine: HTMLElement) {
     const p = empire.commander;
     if (!p) { mine.append(card('var(--pink)', 'paw', 'CHIEF', 'NONE', [h('button', { type: 'button', class: 'cbtn pink', onclick: () => ctx.pact() }, glyph('paw', 20, '#FFF8E7'), 'JOIN')])); return; }
     const cap = p.capacity + p.connectionCapacity, load = p.load + p.structsLoad;
@@ -154,8 +154,8 @@ export function glow(ctx: Ctx): Screen {
       card('var(--pink)', 'alpha', 'ALPHA', fmtAlpha(p.alpha), [h('span', { class: 'tag' }, p.alpha > 0n ? 'READY TO FEED' : 'FORGE FIRST')]));
   }
 
-  function paintSuns() {
-    clear(suns);
+  function paintSuns() { stable(suns, fillSuns); }
+  function fillSuns(suns: HTMLElement) {
     if (!loaded) { suns.append(h('p', { class: 'boomtxt', style: { fontSize: '24px' } }, 'LOOKING…')); return; }
     if (failed && !list.length) { suns.append(h('span', { class: 'refusal' }, 'NET DOWN')); return; }
     const me = empire.commander;

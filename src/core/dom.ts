@@ -6,11 +6,23 @@ type Kind = '' | 'player' | 'enemy' | 'warn';
 type Props = Record<string, unknown>;
 type Child = Node | string | number | null | undefined | false | Child[];
 
+/* Handlers live in a table on the element behind one dispatcher per event type, so a live repaint
+ * can hand an element that stays on the page the handlers of the copy that replaced it (stable()). */
+type Handlers = Record<string, EventListener>;
+const ON = Symbol('on');
+function dispatch(this: HTMLElement, e: Event) { (this as unknown as { [ON]?: Handlers })[ON]?.[e.type]?.call(this, e); }
+function listen(el: Element, type: string, fn: EventListener) {
+  const box = el as unknown as { [ON]?: Handlers };
+  if (!box[ON]) box[ON] = {};
+  if (!box[ON][type]) el.addEventListener(type, dispatch);
+  box[ON][type] = fn;
+}
+
 export function h<K extends keyof HTMLElementTagNameMap>(tag: K, props?: Props | null, ...children: Child[]): HTMLElementTagNameMap[K] {
   const el = document.createElement(tag);
   for (const [k, v] of Object.entries(props || {})) {
     if (v == null || v === false) continue;
-    if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2).toLowerCase(), v as EventListener);
+    if (k.startsWith('on') && typeof v === 'function') listen(el, k.slice(2).toLowerCase(), v as EventListener);
     else if (k === 'style' && typeof v === 'object') for (const [sk, sv] of Object.entries(v as Record<string, string>)) { if (sk.startsWith('--')) el.style.setProperty(sk, String(sv)); else (el.style as unknown as Record<string, string>)[sk] = sv; }
     else if (k === 'class') el.className = String(v);
     else if (k === 'html') el.innerHTML = String(v);
@@ -37,15 +49,75 @@ export function svg(markup: string, cls = ''): SVGSVGElement {
 
 export function clear(el: Element) { while (el.firstChild) el.removeChild(el.firstChild); }
 
-/** Rebuild `box` only when what it shows changed: a live repaint never swaps a button out from under a
- * click. `fill` draws into a detached copy; the copy replaces the content only if its markup differs. */
+/** Repaint `box` from `fill` without a flicker. `fill` draws into a detached copy; nothing happens if
+ * the copy matches, and otherwise the page's own elements are patched to match it: text, attributes
+ * and handlers change in place and only what is new is added. Nothing that stays is rebuilt, so
+ * entrance animations don't replay, hover and pressed states hold, and a click never lands on a
+ * button swapped out from under it. */
 export function stable<T extends HTMLElement>(box: T, fill: (b: T) => void) {
   const tmp = box.cloneNode(false) as T;
   fill(tmp);
-  if (tmp.innerHTML === box.innerHTML && tmp.className === box.className && tmp.hidden === box.hidden && tmp.getAttribute('style') === box.getAttribute('style')) return;
-  box.replaceChildren(...Array.from(tmp.childNodes));
-  box.className = tmp.className; box.hidden = tmp.hidden;
-  const st = tmp.getAttribute('style'); if (st == null) box.removeAttribute('style'); else box.setAttribute('style', st);
+  if (tmp.innerHTML === box.innerHTML && tmp.className === box.className && tmp.hidden === box.hidden && tmp.getAttribute('style') === box.getAttribute('style')) { carry(tmp, box); return; }
+  patchAttrs(box, tmp);
+  box.hidden = tmp.hidden;
+  patchKids(box, tmp);
+}
+
+/** Same markup, new closures: the handlers still need to point at this paint's state. */
+function carry(from: Node, to: Node) {
+  if (from.nodeType !== 1) return;
+  const f = from as unknown as { [ON]?: Handlers }, t = to as unknown as { [ON]?: Handlers };
+  if (f[ON]) for (const [type, fn] of Object.entries(f[ON])) listen(to as Element, type, fn);
+  else if (t[ON]) for (const type of Object.keys(t[ON])) delete t[ON][type];
+  const a = from.childNodes, b = to.childNodes;
+  for (let i = 0; i < a.length && i < b.length; i++) carry(a[i], b[i]);
+}
+
+function patchAttrs(el: Element, next: Element) {
+  for (const { name } of [...el.attributes]) if (!next.hasAttribute(name)) el.removeAttribute(name);
+  for (const { name, value } of [...next.attributes]) if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+  const n = next as unknown as { [ON]?: Handlers }, o = el as unknown as { [ON]?: Handlers };
+  if (o[ON]) for (const type of Object.keys(o[ON])) if (!n[ON]?.[type]) delete o[ON][type];
+  if (n[ON]) for (const [type, fn] of Object.entries(n[ON])) listen(el, type, fn);
+}
+
+/** Can `old` be kept and patched into `next`? Same kind of node; drawn art (portraits, glyphs) only if it is the same art. */
+function same(old: Node, next: Node): boolean {
+  if (old.nodeType !== next.nodeType || old.nodeName !== next.nodeName) return false;
+  if (old.nodeType !== 1) return true;
+  const o = old as Element, n = next as Element;
+  if (o.nodeName === 'CANVAS') return o.getAttribute('data-sig') != null && o.getAttribute('data-sig') === n.getAttribute('data-sig');
+  if (o.namespaceURI !== n.namespaceURI) return false;
+  if (o.namespaceURI === 'http://www.w3.org/2000/svg') return o.outerHTML === n.outerHTML;
+  // a field keeps what the player typed: only the same kind of field is kept
+  if (o.nodeName === 'INPUT') return (o as HTMLInputElement).type === (n as HTMLInputElement).type;
+  return true;
+}
+
+function patchKids(el: Node, next: Node) {
+  const want = [...next.childNodes];
+  for (let i = 0; i < want.length; i++) {
+    const cur = el.childNodes[i], nw = want[i];
+    if (!cur) { el.appendChild(nw); continue; }
+    if (!same(cur, nw)) { el.replaceChild(nw, cur); continue; }
+    if (cur.nodeType === 3 || cur.nodeType === 8) { if (cur.nodeValue !== nw.nodeValue) cur.nodeValue = nw.nodeValue; continue; }
+    const c = cur as Element, n = nw as Element;
+    if (c.nodeName === 'CANVAS' || c.namespaceURI === 'http://www.w3.org/2000/svg') continue;   // same art: leave it be
+    if (c.nodeName === 'INPUT' || c.nodeName === 'TEXTAREA' || c.nodeName === 'SELECT') {
+      const v = (c as HTMLInputElement).value;
+      patchAttrs(c, n);
+      (c as HTMLInputElement).value = v;
+      if ((c as HTMLInputElement).checked !== (n as HTMLInputElement).checked) (c as HTMLInputElement).checked = (n as HTMLInputElement).checked;
+      if ((c as HTMLInputElement).disabled !== (n as HTMLInputElement).disabled) (c as HTMLInputElement).disabled = (n as HTMLInputElement).disabled;
+      continue;
+    }
+    patchAttrs(c, n);
+    // properties that don't live in attributes
+    if ((c as HTMLElement).hidden !== (n as HTMLElement).hidden) (c as HTMLElement).hidden = (n as HTMLElement).hidden;
+    if (c instanceof HTMLButtonElement && c.disabled !== (n as HTMLButtonElement).disabled) c.disabled = (n as HTMLButtonElement).disabled;
+    patchKids(c, n);
+  }
+  while (el.childNodes.length > want.length) el.removeChild(el.lastChild!);
 }
 
 /** Rebuild `box` without throwing away keyboard focus: the control that had it (known by data-key,

@@ -57,7 +57,7 @@ export function den(ctx: Ctx): Screen {
   const scene = new DenScene();
   scene.onPick = (id) => pick(id);
   scene.onSlot = (s) => { const p = player(); if (p && mine()) callDialog(p, s); else if (!wallet.active?.playerId) ctx.pact(); };
-  const stage = mountStage(canvas, scene);
+  const stage = mountStage(canvas, scene, 'den');
 
   function pick(id: string | null) {
     sel = id; scene.selected = id;

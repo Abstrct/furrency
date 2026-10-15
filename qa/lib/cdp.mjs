@@ -21,12 +21,13 @@ export function findChrome() {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-export async function launchChrome({ port = 9222 + Math.floor(Math.random() * 500), headed = false, width = 1280, height = 800, extraArgs = [] } = {}) {
+export async function launchChrome({ port = 9222 + Math.floor(Math.random() * 500), headed = false, width = 1280, height = 800, extraArgs = [], gpu = false } = {}) {
   const profile = join(tmpdir(), `furrency-qa-${process.pid}-${port}`);
   rmSync(profile, { recursive: true, force: true }); mkdirSync(profile, { recursive: true });
   const args = [
     headed ? '' : '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check',
-    '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-webgl', '--enable-precise-memory-info',
+    // software GL by default (the same pixels on every machine); gpu: true uses the real one, for timing
+    ...(gpu ? [] : ['--use-angle=swiftshader', '--enable-unsafe-swiftshader']), '--ignore-gpu-blocklist', '--enable-webgl', '--enable-precise-memory-info',
     '--disable-background-timer-throttling', '--disable-renderer-backgrounding', '--disable-backgrounding-occluded-windows',
     '--autoplay-policy=no-user-gesture-required', '--mute-audio', '--disable-features=BackForwardCache', `--window-size=${width},${height}`, '--hide-scrollbars',
     process.getuid?.() === 0 ? '--no-sandbox' : '', // containers run as root

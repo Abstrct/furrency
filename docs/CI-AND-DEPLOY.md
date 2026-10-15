@@ -219,6 +219,8 @@ CI doesn't build or push the image.
 | Share card and icons (`public/og.png`, `icon-*.png`, `favicon-32.png`) | Locally: `node scripts/brand/render.mjs http://localhost:5193` with `pnpm dev` running; results are committed | Drawn by the game's own ink in a real browser |
 | Playtest lab and the ten playtesters (`qa/lab.mjs`, `qa/PLAYTEST.md`) | Locally, against a private devnet | Needs a `structsd` binary, and it signs real transactions |
 | Devnet end-to-end (join, call, dig, forge, prowl) | Locally | Needs a private chain |
+| Performance probe (`node qa/perf.mjs --join --cpu-canvas --dpr 2`) | Locally, against a devnet dev server | Frame rate, main-thread time and DOM churn per place. `--cpu-canvas` paints canvases the way Firefox does when its canvas acceleration is off; `--gpu` times the real GPU |
+| Firefox probe (`node qa/perf-firefox.mjs --join --headed`) | Locally, with Firefox installed | The same places in real Firefox over WebDriver BiDi (`qa/lib/bidi.mjs`): frame rate, frame pacing (p95) and the resolution each place settled at. `--canvas cpu` forces Firefox's software canvas; `--pin 2` turns the governor off for a baseline |
 
 ## 7. Reproducing CI on your machine
 

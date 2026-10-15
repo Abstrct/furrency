@@ -33,7 +33,7 @@ The game deliberately speaks in symbols and one or two plain words, never senten
 - Keep any helper files in your own folder: `qa/playtests/scratch/YOURNAME/` (other testers run at the same time).
 
 - Use only the lab API above and the Read tool on its screenshots. Do not read or edit the game's source code, and do not touch anything outside `127.0.0.1:9600`.
-- Stay in character (your persona) but report like a professional QA tester.
+- Stay in character (your persona, from `qa/PERSONAS.md` or your instructions) but report like a professional QA tester.
 - Budget: roughly 40–80 actions. Use `wait` generously when the chain must catch up — don't burn actions polling every second.
 - If something blocks you, note it as a finding and try another path; don't give up early.
 

@@ -100,8 +100,8 @@ export function mountShell(app: HTMLElement, pact: () => void): Shell {
   };
 
   // the three links: the chain node, GRASS (the clan's live feed) and the clan's Guild API
-  const paintLinks = () => {
-    clear(linkDots);
+  const paintLinks = () => stable(linkDots, fillLinks);
+  const fillLinks = (linkDots: HTMLElement) => {
     const dot = (word: string, state: string, title: string) => h('span', { class: `lk ${state}`, title }, h('i'), word);
     const g = grass.state, c = clan.state;
     linkDots.append(
@@ -112,8 +112,8 @@ export function mountShell(app: HTMLElement, pact: () => void): Shell {
 
   const paintSound = () => { clear(sound); sound.append(glyph(ambience.on ? 'sound' : 'mute', 24, '#0A0612')); sound.classList.toggle('on', ambience.on); };
 
-  const paintPaw = () => {
-    clear(paw);
+  const paintPaw = () => stable(paw, fillPaw);
+  const fillPaw = (paw: HTMLElement) => {
     const a = wallet.active;
     const sworn = !!a?.playerId;
     paw.className = 'paw-btn' + (sworn ? '' : ' new');
@@ -131,12 +131,12 @@ export function mountShell(app: HTMLElement, pact: () => void): Shell {
     for (const [k, v] of recent) if (v.until < now) recent.delete(k);
     const act = jobs.filter((j) => ['queued', 'waiting', 'signing', 'pending'].includes(j.status));
     const show = [...act, ...[...recent.values()].map((r) => r.job).filter((j) => !act.includes(j))].slice(-5);
-    clear(deeds);
-    for (const j of show) {
+    // patched in place: a deed already showing never slides in again
+    stable(deeds, (deeds) => { for (const j of show) {
       const st = j.status === 'success' ? glyph('done', 18, '#7CFF6B') : j.status === 'failed' ? glyph('warn', 18, '#FF2E88') : j.status === 'pending' || j.status === 'signing' ? glyph('howl', 18, '#22E4FF') : glyph('wait', 18, '#FFE53B');
       deeds.append(h('div', { class: `deed ${j.status === 'signing' ? 'pending' : j.status}`, title: j.error || j.waitReason || j.label },
         h('span', { class: 'st' }, st), h('span', { class: 'lbl' }, j.label), j.status === 'failed' ? h('span', { class: 'refusal', style: { fontSize: '15px', padding: '0 6px' } }, tag(j.error)) : j.status === 'waiting' && j.waitReason ? h('small', { class: 'tag', style: { color: '#FFE53B' } }, tag(j.waitReason)) : null));
-    }
+    } });
   };
   setInterval(() => paintDeeds(txq.jobs), 1500);
 
